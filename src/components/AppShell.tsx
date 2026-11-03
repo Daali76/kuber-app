@@ -1,0 +1,53 @@
+import { BottomNav } from "@/components/BottomNav";
+
+export function AppShell({
+  children,
+  title,
+  subtitle,
+}: {
+  children: React.ReactNode;
+  title?: string;
+  subtitle?: string;
+}) {
+  return (
+    <div className="relative flex min-h-full flex-1 flex-col">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-24 top-0 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
+        <div className="absolute -right-16 top-40 h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
+        <div className="absolute bottom-24 left-1/3 h-56 w-56 rounded-full bg-orange-500/5 blur-3xl" />
+        <div
+          className="absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              "radial-gradient(rgba(148,163,184,0.12) 1px, transparent 1px)",
+            backgroundSize: "22px 22px",
+          }}
+        />
+      </div>
+
+      <header className="relative z-10 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))]">
+        <div className="mx-auto max-w-2xl">
+          <p className="font-[family-name:var(--font-display)] text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-300/90">
+            Cloud Native Atlas
+          </p>
+          {title ? (
+            <h1 className="mt-1 font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-slate-50 sm:text-3xl">
+              {title}
+            </h1>
+          ) : null}
+          {subtitle ? (
+            <p className="mt-1 max-w-prose text-sm leading-relaxed text-slate-400">
+              {subtitle}
+            </p>
+          ) : null}
+        </div>
+      </header>
+
+      <main className="relative z-10 mx-auto w-full max-w-2xl flex-1 px-4 pb-28 pt-2">
+        {children}
+      </main>
+
+      <BottomNav />
+    </div>
+  );
+}
