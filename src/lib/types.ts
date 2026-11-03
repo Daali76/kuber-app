@@ -45,28 +45,25 @@ export interface LocalizedString {
 }
 
 export interface ToolLevels {
-  beginner: string;
-  intermediate: string;
-  advanced: string;
+  beginner: LocalizedString;
+  intermediate: LocalizedString;
+  advanced: LocalizedString;
 }
 
 export interface ToolAlternative {
   id: string;
-  comparison: string;
+  comparison: LocalizedString;
 }
 
 export interface DiagramComponent {
   id: string;
   label: string;
   zone: DiagramZone;
-  /** Sub-slot inside the zone for layout hints */
   slot?: string;
   objectType: K8sObjectType;
   description: string;
   whyThere: string;
-  /** Belongs to this tool (highlighted by default on Diagram tab) */
   highlight: boolean;
-  /** Which implement steps introduce this component */
   stepIds?: string[];
 }
 
@@ -99,11 +96,10 @@ export interface CodeSnippet {
 
 export interface ImplementStep {
   id: string;
-  title: string;
-  description: string;
+  title: LocalizedString;
+  description: LocalizedString;
   code?: CodeSnippet;
   expectedOutput?: string;
-  /** Diagram pieces revealed / focused on this step */
   diagramComponentIds: string[];
   diagramConnectionIds?: string[];
 }
@@ -162,20 +158,19 @@ export interface Tool {
   name: string;
   layer: LayerId;
   maturity: Maturity;
-  summary: string;
-  problem: string;
-  whyItExists: string;
-  analogy: string;
-  howItWorks: string[];
+  summary: LocalizedString;
+  problem: LocalizedString;
+  whyItExists: LocalizedString;
+  analogy: LocalizedString;
+  howItWorks: LocalizedString[];
   prerequisiteLessons: string[];
   levels: ToolLevels;
-  useWhen: string[];
-  avoidWhen: string[];
+  useWhen: LocalizedString[];
+  avoidWhen: LocalizedString[];
   alternatives: ToolAlternative[];
   docsUrl: string;
   repoUrl: string;
-  /** Short placement blurb shown on home map pins */
-  placementBlurb: string;
+  placementBlurb: LocalizedString;
   diagram: ToolDiagram;
   implement: ImplementStep[];
   flows: DiagramFlow[];
@@ -184,18 +179,39 @@ export interface Tool {
   troubleshooting: TroubleshootingScenario[];
 }
 
+export interface LessonBuildStep {
+  componentIds: string[];
+  connectionIds?: string[];
+  caption: LocalizedString;
+}
+
 export interface Lesson {
   id: string;
   order: number;
+  moduleId?: string;
   title: LocalizedString;
   analogy: LocalizedString;
   explanation: LocalizedString[];
+  objectives?: LocalizedString[];
+  commonConfusion?: LocalizedString;
+  summaryLines?: LocalizedString[];
   diagramHighlights: {
     componentIds: string[];
     connectionIds?: string[];
   };
+  buildSteps?: LessonBuildStep[];
+  flows?: DiagramFlow[];
   keyCommands: CodeSnippet[];
   quiz: QuizQuestion[];
+}
+
+export interface LearnModule {
+  id: string;
+  order: number;
+  title: LocalizedString;
+  goals: LocalizedString[];
+  prerequisites: string[];
+  lessonIds: string[];
 }
 
 export interface GlossaryTerm {
@@ -208,9 +224,9 @@ export interface GlossaryTerm {
 
 export interface LayerMeta {
   id: LayerId;
-  name: string;
-  shortName: string;
-  description: string;
+  name: LocalizedString;
+  shortName: LocalizedString;
+  description: LocalizedString;
   accent: string;
   accentSoft: string;
   order: number;
@@ -243,5 +259,66 @@ export interface AppProgress {
   labSteps: Record<string, boolean>;
   quizScores: Record<string, { correct: number; total: number; at: number }>;
   flashcards: Record<string, FlashcardState>;
+  objectives?: Record<string, boolean>;
+  modules?: Record<string, boolean>;
   continue?: { kind: "lesson" | "tool" | "lab"; id: string; href: string };
+}
+
+/** Helper for bilingual strings */
+export function L(en: string, fa: string): LocalizedString {
+  return { en, fa };
+}
+
+export type StrategyInteractive =
+  | "rolling-sliders"
+  | "canary-traffic"
+  | "blue-green-promote"
+  | "kustomize-diff"
+  | "argocd-toggles"
+  | "compare-table";
+
+export interface KustomizeDiffOverlay {
+  id: string;
+  title: LocalizedString;
+  baseYaml: string;
+  renderedYaml: string;
+  note?: LocalizedString;
+}
+
+/** Deployment strategy / GitOps pattern page (same learning shape as Tool). */
+export interface Strategy {
+  id: string;
+  name: LocalizedString;
+  category: "native" | "rollouts" | "gitops" | "compare";
+  summary: LocalizedString;
+  whyItExists: LocalizedString;
+  analogy: LocalizedString;
+  howItWorks: LocalizedString[];
+  useWhen: LocalizedString[];
+  avoidWhen: LocalizedString[];
+  docsUrl: string;
+  relatedToolIds?: string[];
+  relatedStrategyIds?: string[];
+  placementBlurb: LocalizedString;
+  diagram: ToolDiagram;
+  implement: ImplementStep[];
+  flows: DiagramFlow[];
+  /** Extra flows used for rollback / fail-analysis paths. */
+  rollbackFlows?: DiagramFlow[];
+  beforeAfter?: {
+    beforeComponentIds: string[];
+    afterComponentIds: string[];
+  };
+  lab: Lab;
+  quiz: QuizQuestion[];
+  troubleshooting: TroubleshootingScenario[];
+  interactive?: StrategyInteractive;
+  kustomizeDiffs?: KustomizeDiffOverlay[];
+  compareRows?: {
+    dimension: LocalizedString;
+    rolling: LocalizedString;
+    recreate: LocalizedString;
+    canary: LocalizedString;
+    blueGreen: LocalizedString;
+  }[];
 }

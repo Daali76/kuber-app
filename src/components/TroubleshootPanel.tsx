@@ -1,23 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import type { Tool } from "@/lib/types";
+import type { TroubleshootingScenario } from "@/lib/types";
 import { CodeBlock } from "@/components/CodeBlock";
 import { RichText } from "@/components/RichText";
 import { useI18n } from "@/lib/i18n";
 
-export function TroubleshootPanel({ tool }: { tool: Tool }) {
-  const { tr, ui, lang } = useI18n();
+export function TroubleshootPanel({
+  scenarios,
+}: {
+  scenarios: TroubleshootingScenario[];
+}) {
+  const { tr, ui } = useI18n();
   const [picked, setPicked] = useState<Record<string, number>>({});
 
   return (
     <div className="space-y-4">
-      {lang === "fa" ? (
-        <p className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-sm text-amber-100">
-          {ui("translationPending")}
-        </p>
-      ) : null}
-      {tool.troubleshooting.map((sc) => {
+      {scenarios.map((sc) => {
         const choice = picked[sc.id];
         const revealed = choice !== undefined;
         return (
@@ -36,7 +35,8 @@ export function TroubleshootPanel({ tool }: { tool: Tool }) {
                 let tone = "border-white/10 bg-black/20";
                 if (revealed) {
                   if (c.correct) tone = "border-teal-400/50 bg-teal-400/15";
-                  else if (choice === i) tone = "border-rose-400/40 bg-rose-400/10";
+                  else if (choice === i)
+                    tone = "border-rose-400/40 bg-rose-400/10";
                 } else if (choice === i) {
                   tone = "border-sky-400/40 bg-sky-400/15";
                 }
@@ -56,9 +56,7 @@ export function TroubleshootPanel({ tool }: { tool: Tool }) {
             {revealed ? (
               <div className="space-y-2 text-sm text-slate-300">
                 <p>
-                  <RichText
-                    text={sc.choices[choice!]!.feedback}
-                  />
+                  <RichText text={sc.choices[choice!]!.feedback} />
                 </p>
                 {sc.diagnosticCommands.map((cmd) => (
                   <CodeBlock key={cmd.title} example={cmd} />

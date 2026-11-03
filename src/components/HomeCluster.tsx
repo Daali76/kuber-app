@@ -24,8 +24,8 @@ function overviewModel() {
       label: tool.name,
       zone,
       objectType: "External" as const,
-      description: tool.summary,
-      whyThere: tool.placementBlurb,
+      description: tool.summary.en,
+      whyThere: tool.placementBlurb.en,
       highlight: true,
       toolId: tool.id,
       slot: tool.id,
@@ -69,7 +69,7 @@ function pinZone(tool: Tool): DiagramZone {
 }
 
 export function HomeCluster() {
-  const { ui } = useI18n();
+  const { ui, tr } = useI18n();
   const model = useMemo(() => overviewModel(), []);
   const [filter, setFilter] = useState<string>("all");
   const raw = useSyncExternalStore(
@@ -86,13 +86,11 @@ export function HomeCluster() {
     <div className="space-y-5">
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220] p-5 md:p-8">
         <div className="brand-orb pointer-events-none absolute -end-8 -top-10 h-36 w-36 rounded-full bg-teal-400/20 blur-2xl" />
-        <p className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-slate-50 md:text-5xl">
+        <p className="heading-page font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-slate-50 md:text-5xl">
           {ui("brand")}
         </p>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400 md:text-base">
-          Select a tool to see exactly where it runs in a Kubernetes cluster —
-          then walk an implementation guide that builds the diagram step by
-          step.
+        <p className="mt-2 max-w-xl text-base leading-relaxed text-slate-400">
+          {ui("homeTagline")}
         </p>
         <div className="hero-rule mt-4 max-w-md rounded-full" />
       </div>
@@ -133,7 +131,7 @@ export function HomeCluster() {
             components={model.components}
             connections={model.connections}
             accent="#38bdf8"
-            title="Cluster overview — select a tool pin"
+            title={ui("clusterOverview")}
             navigateOnSelect={Object.fromEntries(
               Object.entries(model.pinToTool).map(([pin, id]) => [
                 pin,
@@ -145,18 +143,18 @@ export function HomeCluster() {
 
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-            Tools by layer
+            {ui("toolsByLayer")}
           </p>
           <div className="mb-3 flex flex-wrap gap-2">
             <FilterChip
-              label="All"
+              label={ui("allLayers")}
               active={filter === "all"}
               onClick={() => setFilter("all")}
             />
             {layers.map((l) => (
               <FilterChip
                 key={l.id}
-                label={l.shortName}
+                label={tr(l.shortName)}
                 active={filter === l.id}
                 onClick={() => setFilter(l.id)}
                 accent={l.accent}
@@ -181,8 +179,8 @@ export function HomeCluster() {
                       <span className="font-[family-name:var(--font-display)] font-semibold text-slate-50">
                         {tool.name}
                       </span>
-                      <span className="mt-0.5 block text-sm text-slate-400">
-                        {tool.placementBlurb}
+                      <span className="mt-0.5 block text-base text-slate-400">
+                        {tr(tool.placementBlurb)}
                       </span>
                     </span>
                   </Link>

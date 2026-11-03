@@ -183,7 +183,7 @@ coredns-xxxx                           1/1     Running   0          90s
 kube-proxy-xxxx                        1/1     Running   0          90s`,
         {
           en: "Nodes report Ready when the CNI and kubelet are healthy; core add-ons run in kube-system.",
-          fa: "وقتی CNI و kubelet سالم باشند نودها Ready می‌شوند؛ افزونه‌های اصلی در kube-system اجرا می‌شوند.",
+          fa: "وقتی CNI و kubelet سالم باشند Nodeها Ready می‌شوند؛ افزونه‌های اصلی در kube-system اجرا می‌شوند.",
         },
         ["apiserver", "kubelet"],
         ["kubelet-api"],
@@ -280,7 +280,7 @@ kubectl get pods -l app=web`,
       1,
       {
         en: "The API server persists state in etcd; kubelets only report node-local status.",
-        fa: "API server وضعیت را در etcd ذخیره می‌کند؛ kubelet فقط وضعیت محلی نود را گزارش می‌دهد.",
+        fa: "API server وضعیت را در etcd ذخیره می‌کند؛ kubelet فقط وضعیت محلی Node را گزارش می‌دهد.",
       },
     ),
     q(
@@ -323,18 +323,18 @@ kubectl get pods -l app=web`,
       "k8s-pending",
       {
         en: "Pods stay Pending; events mention insufficient cpu or no nodes.",
-        fa: "Podها Pending می‌مانند؛ رویدادها کمبود cpu یا نبود نود می‌گویند.",
+        fa: "Podها Pending می‌مانند؛ رویدادها کمبود cpu یا نبود Node می‌گویند.",
       },
       [
         {
           label: {
             en: "Check node capacity and Pod resource requests",
-            fa: "ظرفیت نود و resource requestهای Pod را بررسی کنید",
+            fa: "ظرفیت Node و resource requestهای Pod را بررسی کنید",
           },
           correct: true,
           feedback: {
             en: "Right—Pending often means scheduling cannot fit requests or no Ready nodes exist.",
-            fa: "درست—Pending اغلب یعنی scheduler نمی‌تواند requestها را جا دهد یا نود Ready نیست.",
+            fa: "درست—Pending اغلب یعنی scheduler نمی‌تواند requestها را جا دهد یا Node Ready نیست.",
           },
         },
         {
@@ -364,7 +364,7 @@ kubectl describe nodes | grep -A5 "Allocated resources"`,
       },
       {
         en: "Add nodes, lower requests, add tolerations, or fix NotReady nodes/CNI.",
-        fa: "نود اضافه کنید، request کم کنید، toleration بگذارید، یا نود/CNI NotReady را درست کنید.",
+        fa: "Node اضافه کنید، request کم کنید، toleration بگذارید، یا Node/CNI NotReady را درست کنید.",
       },
     ),
     troubleshoot(
@@ -527,7 +527,7 @@ docker exec cna-lab-control-plane crictl ps -a | grep demo || echo "gone"`,
       { en: "Where do containers actually execute?", fa: "کانتینرها واقعاً کجا اجرا می‌شوند؟" },
       [{ en: "On the control plane only", fa: "فقط روی control plane" }, { en: "On worker nodes via the runtime", fa: "روی worker از طریق runtime" }, { en: "Inside etcd", fa: "داخل etcd" }],
       1,
-      { en: "Workloads run on nodes; the control plane orchestrates.", fa: "workload روی نودها اجرا می‌شود؛ control plane هماهنگ می‌کند." },
+      { en: "Workloads run on nodes; the control plane orchestrates.", fa: "workload روی Nodeها اجرا می‌شود؛ control plane هماهنگ می‌کند." },
     ),
   ],
   troubleshooting: [
@@ -535,22 +535,22 @@ docker exec cna-lab-control-plane crictl ps -a | grep demo || echo "gone"`,
       "ctd-imagepull",
       { en: "Pod events: Failed to pull image / ImagePullBackOff.", fa: "رویداد Pod: Failed to pull image / ImagePullBackOff." },
       [
-        { label: { en: "Verify image name, tag, and registry auth on the node", fa: "نام image، tag و auth رجیستری روی نود را بررسی کنید" }, correct: true, feedback: { en: "Yes—CRI pull errors are usually typo, missing tag, or secret.", fa: "بله—خطای pull CRI معمولاً typo، tag یا secret است." } },
+        { label: { en: "Verify image name, tag, and registry auth on the node", fa: "نام image، tag و auth رجیستری روی Node را بررسی کنید" }, correct: true, feedback: { en: "Yes—CRI pull errors are usually typo, missing tag, or secret.", fa: "بله—خطای pull CRI معمولاً typo، tag یا secret است." } },
         { label: { en: "Reinstall Kubernetes to fix containerd", fa: "Kubernetes را دوباره نصب کنید" }, correct: false, feedback: { en: "Rarely needed; fix pull path and credentials first.", fa: "به‌ندرت لازم است؛ اول مسیر pull و credential را درست کنید." } },
       ],
       [{ language: "bash", title: "Events", code: `kubectl describe pod <name> | grep -A3 Events\nkubectl get events --field-selector involvedObject.name=<name>` }],
       { en: "Wrong reference, private registry without imagePullSecret, or network/DNS blocking registry.", fa: "ارجاع اشتباه، رجیستری خصوصی بدون imagePullSecret، یا شبکه/DNS مانع رجیستری." },
-      { en: "Fix image string, add imagePullSecret, or test crictl pull on the node.", fa: "رشته image را درست کنید، imagePullSecret اضافه کنید، یا crictl pull روی نود تست کنید." },
+      { en: "Fix image string, add imagePullSecret, or test crictl pull on the node.", fa: "رشته image را درست کنید، imagePullSecret اضافه کنید، یا crictl pull روی Node تست کنید." },
     ),
     troubleshoot(
       "ctd-sandbox",
       { en: "Pod stuck in ContainerCreating; CRI sandbox errors in kubelet log.", fa: "Pod در ContainerCreating گیر کرده؛ خطای sandbox CRI در لاگ kubelet." },
       [
-        { label: { en: "Check kubelet and containerd logs on the node", fa: "لاگ kubelet و containerd روی نود را ببینید" }, correct: true, feedback: { en: "Correct—sandbox creation failures show in runtime/kubelet logs.", fa: "درست—شکست ساخت sandbox در لاگ runtime/kubelet دیده می‌شود." } },
+        { label: { en: "Check kubelet and containerd logs on the node", fa: "لاگ kubelet و containerd روی Node را ببینید" }, correct: true, feedback: { en: "Correct—sandbox creation failures show in runtime/kubelet logs.", fa: "درست—شکست ساخت sandbox در لاگ runtime/kubelet دیده می‌شود." } },
         { label: { en: "Scale the Deployment to zero", fa: "Deployment را به صفر scale کنید" }, correct: false, feedback: { en: "That avoids the workload but does not diagnose CRI.", fa: "workload را حذف می‌کند ولی CRI را تشخیص نمی‌دهد." } },
       ],
       [{ language: "bash", title: "Node logs", code: `journalctl -u kubelet -n 50\njournalctl -u containerd -n 50` }],
-      { en: "Corrupt snapshot, full disk, or containerd not running on the node.", fa: "snapshot خراب، دیسک پر، یا containerd روی نود اجرا نیست." },
+      { en: "Corrupt snapshot, full disk, or containerd not running on the node.", fa: "snapshot خراب، دیسک پر، یا containerd روی Node اجرا نیست." },
       { en: "Free disk space, restart containerd/kubelet, remove stale sandboxes with crictl.", fa: "فضای دیسک آزاد کنید، containerd/kubelet را restart کنید، sandboxهای کهنه را با crictl پاک کنید." },
     ),
   ],
@@ -637,7 +637,7 @@ kubectl run -it --rm dns-test2 --image=busybox:1.36 --restart=Never -- \\
     },
   ),
   quiz: [
-    q("dns-q1", { en: "Default cluster DNS domain suffix?", fa: "پسوند پیش‌فرض دامنه DNS کلاستر؟" }, [{ en: "cluster.local", fa: "cluster.local" }, { en: "kubernetes.io", fa: "kubernetes.io" }, { en: "svc.local", fa: "svc.local" }], 0, { en: "Service FQDNs end in .svc.cluster.local by default.", fa: "FQDN سرویس‌ها به‌طور پیش‌فرض با .svc.cluster.local تمام می‌شود." }),
+    q("dns-q1", { en: "Default cluster DNS domain suffix?", fa: "پسوند پیش‌فرض دامنه DNS کلاستر؟" }, [{ en: "cluster.local", fa: "cluster.local" }, { en: "kubernetes.io", fa: "kubernetes.io" }, { en: "svc.local", fa: "svc.local" }], 0, { en: "Service FQDNs end in .svc.cluster.local by default.", fa: "FQDN Serviceها به‌طور پیش‌فرض با .svc.cluster.local تمام می‌شود." }),
     q("dns-q2", { en: "Where is CoreDNS config stored?", fa: "پیکربندی CoreDNS کجا ذخیره می‌شود؟" }, [{ en: "ConfigMap coredns", fa: "ConfigMap coredns" }, { en: "Secret etcd", fa: "Secret etcd" }, { en: "kubelet config", fa: "پیکربندی kubelet" }], 0, { en: "The Corefile lives in the coredns ConfigMap.", fa: "Corefile در ConfigMap coredns است." }),
     q("dns-q3", { en: "Which object provides the DNS server IP to Pods?", fa: "کدام آبجکت IP سرور DNS را به Pod می‌دهد؟" }, [{ en: "kube-dns Service", fa: "Service kube-dns" }, { en: "Ingress", fa: "Ingress" }, { en: "PersistentVolume", fa: "PersistentVolume" }], 0, { en: "kubelet sets resolv.conf to the kube-dns ClusterIP.", fa: "kubelet resolv.conf را روی ClusterIP kube-dns تنظیم می‌کند." }),
   ],
@@ -698,7 +698,7 @@ const ciliumPack: LearningPack = {
           connectionIds: ["users-api"],
         },
         {
-          caption: { en: "Agents watch policies and compile them into eBPF on each node.", fa: "agentها policy را watch و در eBPF هر نود compile می‌کنند." },
+          caption: { en: "Agents watch policies and compile them into eBPF on each node.", fa: "agentها policy را watch و در eBPF هر Node compile می‌کنند." },
           componentIds: ["cilium-agent", "cilium-crd"],
           connectionIds: ["agent-api", "operator-api"],
         },
@@ -726,7 +726,7 @@ cilium   2/2   2   2   60s
 NAME                       STATUS   ROLES           AGE
 cna-cilium-control-plane   Ready    control-plane   3m
 cna-cilium-worker          Ready    <none>          3m`,
-        { en: "Helm installs agent DaemonSet and operator; nodes become Ready once the CNI is up.", fa: "Helm agent DaemonSet و operator نصب می‌کند؛ با بالا آمدن CNI نودها Ready می‌شوند." },
+        { en: "Helm installs agent DaemonSet and operator; nodes become Ready once the CNI is up.", fa: "Helm agent DaemonSet و operator نصب می‌کند؛ با بالا آمدن CNI Nodeها Ready می‌شوند." },
         ["cilium-agent", "cilium-operator"],
         ["agent-api"],
       ),
@@ -749,13 +749,13 @@ cilium-xxxxx   1/1   Running`,
   ),
   quiz: [
     q("cil-q1", { en: "Why use kind with disableDefaultCNI for Cilium labs?", fa: "چرا kind با disableDefaultCNI برای لاب Cilium؟" }, [{ en: "Avoid two CNIs fighting", fa: "جلوگیری از تداخل دو CNI" }, { en: "Disable Kubernetes", fa: "غیرفعال کردن Kubernetes" }, { en: "Skip etcd", fa: "رد شدن از etcd" }], 0, { en: "Only one CNI should manage pod networking.", fa: "فقط یک CNI باید شبکه Pod را مدیریت کند." }),
-    q("cil-q2", { en: "Cilium agent runs as which controller type?", fa: "agent Cilium به‌صورت کدام نوع controller اجرا می‌شود؟" }, [{ en: "DaemonSet", fa: "DaemonSet" }, { en: "CronJob", fa: "CronJob" }, { en: "StatefulSet only", fa: "فقط StatefulSet" }], 0, { en: "Every node needs a local agent.", fa: "هر نود به agent محلی نیاز دارد." }),
+    q("cil-q2", { en: "Cilium agent runs as which controller type?", fa: "agent Cilium به‌صورت کدام نوع controller اجرا می‌شود؟" }, [{ en: "DaemonSet", fa: "DaemonSet" }, { en: "CronJob", fa: "CronJob" }, { en: "StatefulSet only", fa: "فقط StatefulSet" }], 0, { en: "Every node needs a local agent.", fa: "هر Node به agent محلی نیاز دارد." }),
     q("cil-q3", { en: "CiliumNetworkPolicy is which API kind?", fa: "CiliumNetworkPolicy چه نوع API است؟" }, [{ en: "Cilium CRD", fa: "CRD Cilium" }, { en: "Built-in Ingress", fa: "Ingress داخلی" }, { en: "Pod spec field", fa: "فیلد spec Pod" }], 0, { en: "Policy is a custom resource under cilium.io.", fa: "policy یک custom resource تحت cilium.io است." }),
   ],
   troubleshooting: [
     troubleshoot(
       "cil-notready",
-      { en: "Nodes stay NotReady after kind create with disableDefaultCNI.", fa: "نودها بعد از kind با disableDefaultCNI NotReady می‌مانند." },
+      { en: "Nodes stay NotReady after kind create with disableDefaultCNI.", fa: "Nodeها بعد از kind با disableDefaultCNI NotReady می‌مانند." },
       [
         { label: { en: "Install Cilium (or another CNI) before expecting Ready", fa: "قبل از Ready انتظار، Cilium (یا CNI دیگر) نصب کنید" }, correct: true, feedback: { en: "Expected until a CNI is installed.", fa: "تا نصب CNI طبیعی است." } },
         { label: { en: "Increase etcd quota", fa: "سهمیه etcd را زیاد کنید" }, correct: false, feedback: { en: "Not related to CNI readiness.", fa: "به Ready بودن CNI ربطی ندارد." } },
@@ -859,7 +859,7 @@ sleep istio-proxy`,
   quiz: [
     q("ist-q1", { en: "Which container is injected beside your app?", fa: "کنار اپ کدام کانتینر inject می‌شود؟" }, [{ en: "istio-proxy (Envoy)", fa: "istio-proxy (Envoy)" }, { en: "etcd", fa: "etcd" }, { en: "coredns", fa: "coredns" }], 0, { en: "The data plane proxy is Envoy.", fa: "پروکسی data plane همان Envoy است." }),
     q("ist-q2", { en: "Primary Istio control plane component?", fa: "جزء اصلی control plane Istio؟" }, [{ en: "istiod", fa: "istiod" }, { en: "kube-scheduler", fa: "kube-scheduler" }, { en: "containerd", fa: "containerd" }], 0, { en: "istiod combines pilot, citadel, galley responsibilities.", fa: "istiod نقش pilot و بخش‌های امنیت/پیکربندی را ادغام کرده." }),
-    q("ist-q3", { en: "VirtualService primarily configures…", fa: "VirtualService عمدتاً … را پیکربندی می‌کند" }, [{ en: "L7 routing and weights", fa: "مسیریابی L7 و وزن‌ها" }, { en: "Node disk layout", fa: "چیدمان دیسک نود" }, { en: "etcd backups", fa: "پشتیبان etcd" }], 0, { en: "VirtualService defines HTTP/TCP routing rules.", fa: "VirtualService قوانین مسیریابی HTTP/TCP را تعریف می‌کند." }),
+    q("ist-q3", { en: "VirtualService primarily configures…", fa: "VirtualService عمدتاً … را پیکربندی می‌کند" }, [{ en: "L7 routing and weights", fa: "مسیریابی L7 و وزن‌ها" }, { en: "Node disk layout", fa: "چیدمان دیسک Node" }, { en: "etcd backups", fa: "پشتیبان etcd" }], 0, { en: "VirtualService defines HTTP/TCP routing rules.", fa: "VirtualService قوانین مسیریابی HTTP/TCP را تعریف می‌کند." }),
   ],
   troubleshooting: [
     troubleshoot(
@@ -877,7 +877,7 @@ sleep istio-proxy`,
       "ist-503",
       { en: "Mesh calls return 503 UF or NR.", fa: "فراخوان‌های mesh 503 UF یا NR برمی‌گردانند." },
       [
-        { label: { en: "Check DestinationRule subsets and Service ports match", fa: "subsetهای DestinationRule و port سرویس را تطبیق دهید" }, correct: true, feedback: { en: "503 often means no healthy upstream or bad subset.", fa: "503 اغلب upstream سالم نیست یا subset اشتباه است." } },
+        { label: { en: "Check DestinationRule subsets and Service ports match", fa: "subsetهای DestinationRule و port Service را تطبیق دهید" }, correct: true, feedback: { en: "503 often means no healthy upstream or bad subset.", fa: "503 اغلب upstream سالم نیست یا subset اشتباه است." } },
         { label: { en: "Delete istiod", fa: "istiod را حذف کنید" }, correct: false, feedback: { en: "That breaks the mesh—diagnose routing instead.", fa: "mesh را می‌شکند—مسیریابی را تشخیص دهید." } },
       ],
       [{ language: "bash", title: "Proxy config", code: `istioctl proxy-status\nistioctl proxy-config routes deploy/<name>` }],
@@ -913,7 +913,7 @@ const prometheusPack: LearningPack = {
       title: { en: "Scrape pipeline", fa: "مسیر scrape" },
       steps: [
         {
-          caption: { en: "ServiceMonitor selects Services exposing /metrics.", fa: "ServiceMonitor سرویس‌های با /metrics را انتخاب می‌کند." },
+          caption: { en: "ServiceMonitor selects Services exposing /metrics.", fa: "ServiceMonitor Serviceهای با /metrics را انتخاب می‌کند." },
           componentIds: ["servicemonitor", "svc", "app-pod"],
           connectionIds: ["prom-scrape"],
         },
@@ -971,7 +971,7 @@ curl -s 'http://127.0.0.1:9090/api/v1/query?query=up' | head -c 200` },
       "prom-target-down",
       { en: "Prometheus target shows DOWN in /targets.", fa: "target در /targets وضعیت DOWN دارد." },
       [
-        { label: { en: "Verify Service port name and ServiceMonitor selector/labels", fa: "نام port سرویس و selector/label ServiceMonitor را چک کنید" }, correct: true, feedback: { en: "Misaligned selectors are the top cause of missing scrapes.", fa: "selector ناهماهنگ شایع‌ترین علت scrape از دست رفته است." } },
+        { label: { en: "Verify Service port name and ServiceMonitor selector/labels", fa: "نام port Service و selector/label ServiceMonitor را چک کنید" }, correct: true, feedback: { en: "Misaligned selectors are the top cause of missing scrapes.", fa: "selector ناهماهنگ شایع‌ترین علت scrape از دست رفته است." } },
         { label: { en: "Restart Grafana only", fa: "فقط Grafana را restart کنید" }, correct: false, feedback: { en: "Grafana displays metrics; it does not scrape.", fa: "Grafana نمایش می‌دهد؛ scrape نمی‌کند." } },
       ],
       [{ language: "bash", title: "SM debug", code: `kubectl -n monitoring get servicemonitor\nkubectl -n monitoring get prometheus -o yaml | grep -A15 serviceMonitorSelector` }],
@@ -1051,7 +1051,7 @@ curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/login` },
   ),
   quiz: [
     q("grf-q1", { en: "Grafana does not store long-term metrics; it…", fa: "Grafana متریک بلندمدت نگه نمی‌دارد؛ …" }, [{ en: "Queries external datasources", fa: "از datasource خارجی کوئری می‌زند" }, { en: "Replaces Prometheus TSDB", fa: "جایگزین TSDB Prometheus" }, { en: "Scrapes /metrics itself", fa: "خودش /metrics scrape می‌کند" }], 0, { en: "Grafana is a visualization layer.", fa: "Grafana لایه visualization است." }),
-    q("grf-q2", { en: "Typical Prometheus datasource URL in-cluster?", fa: "URL معمول datasource Prometheus در کلاستر؟" }, [{ en: "http://prometheus-service:9090", fa: "http://prometheus-service:9090" }, { en: "https://etcd:2379", fa: "https://etcd:2379" }, { en: "dns://kube-dns", fa: "dns://kube-dns" }], 0, { en: "Grafana talks to the Prometheus Service DNS name.", fa: "Grafana با DNS name سرویس Prometheus صحبت می‌کند." }),
+    q("grf-q2", { en: "Typical Prometheus datasource URL in-cluster?", fa: "URL معمول datasource Prometheus در کلاستر؟" }, [{ en: "http://prometheus-service:9090", fa: "http://prometheus-service:9090" }, { en: "https://etcd:2379", fa: "https://etcd:2379" }, { en: "dns://kube-dns", fa: "dns://kube-dns" }], 0, { en: "Grafana talks to the Prometheus Service DNS name.", fa: "Grafana با DNS name Service Prometheus صحبت می‌کند." }),
     q("grf-q3", { en: "Template variables help…", fa: "متغیرهای template …" }, [{ en: "Reuse dashboards across namespaces/clusters", fa: "استفاده مجدد داشبورد بین namespace/کلاستر" }, { en: "Replace RBAC", fa: "جایگزین RBAC" }, { en: "Install CNI", fa: "نصب CNI" }], 0, { en: "Variables parameterize queries.", fa: "متغیرها کوئری را پارامتrizه می‌کنند." }),
   ],
   troubleshooting: [
@@ -1157,7 +1157,7 @@ telemetrygen traces --otlp-insecure --otlp-endpoint 127.0.0.1:4317 --traces 3` }
   quiz: [
     q("otel-q1", { en: "Default OTLP gRPC port?", fa: "پورت پیش‌فرض OTLP gRPC؟" }, [{ en: "4317", fa: "4317" }, { en: "6443", fa: "6443" }, { en: "53", fa: "53" }], 0, { en: "4317 gRPC and 4318 HTTP are standard OTLP ports.", fa: "4317 gRPC و 4318 HTTP پورت‌های استاندارد OTLP هستند." }),
     q("otel-q2", { en: "Collector components include…", fa: "اجزای collector شامل …" }, [{ en: "receivers, processors, exporters", fa: "receiver، processor، exporter" }, { en: "scheduler, etcd", fa: "scheduler، etcd" }, { en: "kube-proxy only", fa: "فقط kube-proxy" }], 0, { en: "Pipeline is receiver → processor → exporter.", fa: "pipeline: receiver → processor → exporter." }),
-    q("otel-q3", { en: "W3C tracecontext propagates…", fa: "W3C tracecontext … را منتقل می‌کند" }, [{ en: "Trace IDs across service boundaries", fa: "Trace ID بین سرویس‌ها" }, { en: "Node kernel version", fa: "نسخه kernel نود" }, { en: "Helm chart versions", fa: "نسخه chart Helm" }], 0, { en: "Context links spans in distributed traces.", fa: "context spanها را در trace توزیع‌شده وصل می‌کند." }),
+    q("otel-q3", { en: "W3C tracecontext propagates…", fa: "W3C tracecontext … را منتقل می‌کند" }, [{ en: "Trace IDs across service boundaries", fa: "Trace ID بین مرز instanceهای اپ" }, { en: "Node kernel version", fa: "نسخه kernel Node" }, { en: "Helm chart versions", fa: "نسخه chart Helm" }], 0, { en: "Context links spans in distributed traces.", fa: "context spanها را در trace توزیع‌شده وصل می‌کند." }),
   ],
   troubleshooting: [
     troubleshoot(
@@ -1208,10 +1208,10 @@ const fluentBitPack: LearningPack = {
   flows: [
     {
       id: "fb-ship",
-      title: { en: "Log shipping from node", fa: "ارسال لاگ از نود" },
+      title: { en: "Log shipping from node", fa: "ارسال لاگ از Node" },
       steps: [
         {
-          caption: { en: "kubelet writes container logs to files on the node.", fa: "kubelet لاگ کانتینر را در فایل روی نود می‌نویسد." },
+          caption: { en: "kubelet writes container logs to files on the node.", fa: "kubelet لاگ کانتینر را در فایل روی Node می‌نویسد." },
           componentIds: ["kubelet", "app-pod"],
           connectionIds: ["fb-kubelet"],
         },
@@ -1240,7 +1240,7 @@ helm install fluent-bit fluent/fluent-bit \\
   --set kind=DaemonSet
 kubectl -n logging get pods -l app.kubernetes.io/name=fluent-bit` },
         `fluent-bit-xxxxx   1/1   Running`,
-        { en: "DaemonSet agents start on each node to tail container logs.", fa: "agentهای DaemonSet روی هر نود برای tail لاگ کانتینر بالا می‌آیند." },
+        { en: "DaemonSet agents start on each node to tail container logs.", fa: "agentهای DaemonSet روی هر Node برای tail لاگ کانتینر بالا می‌آیند." },
         ["fluent-bit"],
       ),
       labStep(
@@ -1262,7 +1262,7 @@ kubectl -n logging logs -l app.kubernetes.io/name=fluent-bit --tail=20 | grep he
   quiz: [
     q("fb-q1", { en: "Fluent Bit on Kubernetes usually runs as…", fa: "Fluent Bit در Kubernetes معمولاً به‌صورت …" }, [{ en: "DaemonSet", fa: "DaemonSet" }, { en: "Job", fa: "Job" }, { en: "Ingress", fa: "Ingress" }], 0, { en: "One log agent per node is typical.", fa: "معمولاً یک agent لاگ per node." }),
     q("fb-q2", { en: "Kubernetes filter adds…", fa: "filter kubernetes … اضافه می‌کند" }, [{ en: "Pod/namespace metadata", fa: "metadata pod/namespace" }, { en: "TLS certificates", fa: "گواهی TLS" }, { en: "PersistentVolume claims", fa: "claim PersistentVolume" }], 0, { en: "Enrichment helps search in backends.", fa: "غنی‌سازی جستجو در backend را آسان می‌کند." }),
-    q("fb-q3", { en: "Container logs on Linux nodes are commonly under…", fa: "لاگ کانتینر روی نود Linux معمولاً زیر …" }, [{ en: "/var/log/containers", fa: "/var/log/containers" }, { en: "/etc/kubernetes", fa: "/etc/kubernetes" }, { en: "/var/lib/etcd", fa: "/var/lib/etcd" }], 0, { en: "kubelet symlinks log files there.", fa: "kubelet symlink لاگ‌ها را آنجا می‌گذارد." }),
+    q("fb-q3", { en: "Container logs on Linux nodes are commonly under…", fa: "لاگ کانتینر روی Node Linux معمولاً زیر …" }, [{ en: "/var/log/containers", fa: "/var/log/containers" }, { en: "/etc/kubernetes", fa: "/etc/kubernetes" }, { en: "/var/lib/etcd", fa: "/var/lib/etcd" }], 0, { en: "kubelet symlinks log files there.", fa: "kubelet symlink لاگ‌ها را آنجا می‌گذارد." }),
   ],
   troubleshooting: [
     troubleshoot(
@@ -1281,7 +1281,7 @@ kubectl -n logging logs -l app.kubernetes.io/name=fluent-bit --tail=20 | grep he
       { en: "Fluent Bit pod CrashLoopBackOff.", fa: "Pod Fluent Bit CrashLoopBackOff." },
       [
         { label: { en: "Validate config with fluent-bit -R dry run / check chart config", fa: "config را validate کنید" }, correct: true, feedback: { en: "Syntax errors in parsers/filters crash the agent.", fa: "خطای syntax در parser/filter agent را crash می‌کند." } },
-        { label: { en: "Delete all nodes", fa: "همه نودها را حذف کنید" }, correct: false, feedback: { en: "Fix configuration instead.", fa: "پیکربندی را درست کنید." } },
+        { label: { en: "Delete all nodes", fa: "همه Nodeها را حذف کنید" }, correct: false, feedback: { en: "Fix configuration instead.", fa: "پیکربندی را درست کنید." } },
       ],
       [{ language: "bash", title: "Describe", code: `kubectl -n logging describe pod -l app.kubernetes.io/name=fluent-bit | tail -25` }],
       { en: "Invalid fluent-bit.conf from Helm values or missing volume mounts.", fa: "fluent-bit.conf نامعتبر از values Helm یا mount volume نیست." },
@@ -1383,7 +1383,7 @@ guestbook     Synced        Healthy`,
   quiz: [
     q("argo-q1", { en: "Argo CD desired state lives primarily in…", fa: "وضعیت مطلوب Argo CD عمدتاً در …" }, [{ en: "Git", fa: "Git" }, { en: "Local kubectl cache", fa: "cache محلی kubectl" }, { en: "containerd images", fa: "imageهای containerd" }], 0, { en: "GitOps uses Git as source of truth.", fa: "GitOps از Git به‌عنوان source of truth استفاده می‌کند." }),
     q("argo-q2", { en: "Application CR belongs to which API group?", fa: "CR Application متعلق به کدام API group است؟" }, [{ en: "argoproj.io", fa: "argoproj.io" }, { en: "networking.k8s.io", fa: "networking.k8s.io" }, { en: "cilium.io", fa: "cilium.io" }], 0, { en: "Applications are argoproj.io/v1alpha1.", fa: "Applicationها argoproj.io/v1alpha1 هستند." }),
-    q("argo-q3", { en: "OutOfSync means…", fa: "OutOfSync یعنی …" }, [{ en: "Cluster differs from Git", fa: "کلاستر با Git فرق دارد" }, { en: "etcd is full", fa: "etcd پر است" }, { en: "Nodes NotReady", fa: "نودها NotReady" }], 0, { en: "Controller detected drift from desired manifests.", fa: "controller انحراف از manifest مطلوب را دید." }),
+    q("argo-q3", { en: "OutOfSync means…", fa: "OutOfSync یعنی …" }, [{ en: "Cluster differs from Git", fa: "کلاستر با Git فرق دارد" }, { en: "etcd is full", fa: "etcd پر است" }, { en: "Nodes NotReady", fa: "Nodeها NotReady" }], 0, { en: "Controller detected drift from desired manifests.", fa: "controller انحراف از manifest مطلوب را دید." }),
   ],
   troubleshooting: [
     troubleshoot(
@@ -1602,7 +1602,7 @@ spec:
   ),
   quiz: [
     q("cm-q1", { en: "cert-manager stores issued certs in…", fa: "cert-manager گواهی صادر شده را در …" }, [{ en: "Kubernetes Secret", fa: "Secret Kubernetes" }, { en: "ConfigMap only", fa: "فقط ConfigMap" }, { en: "containerd layers", fa: "لایه containerd" }], 0, { en: "tls.crt/tls.key land in typed Secrets.", fa: "tls.crt/tls.key در Secret نوع‌دار می‌رود." }),
-    q("cm-q2", { en: "HTTP-01 challenge typically uses…", fa: "challenge HTTP-01 معمولاً …" }, [{ en: "Temporary Ingress solver pod/route", fa: "مسیر/pod solver Ingress موقت" }, { en: "SSH to nodes", fa: "SSH به نودها" }, { en: "etcd snapshot", fa: "snapshot etcd" }], 0, { en: "Let's Encrypt hits a well-known URL on your domain.", fa: "Let's Encrypt URL well-known روی دامنه شما را می‌زند." }),
+    q("cm-q2", { en: "HTTP-01 challenge typically uses…", fa: "challenge HTTP-01 معمولاً …" }, [{ en: "Temporary Ingress solver pod/route", fa: "مسیر/pod solver Ingress موقت" }, { en: "SSH to nodes", fa: "SSH به Nodeها" }, { en: "etcd snapshot", fa: "snapshot etcd" }], 0, { en: "Let's Encrypt hits a well-known URL on your domain.", fa: "Let's Encrypt URL well-known روی دامنه شما را می‌زند." }),
     q("cm-q3", { en: "ClusterIssuer is…", fa: "ClusterIssuer …" }, [{ en: "Cluster-scoped issuer", fa: "issuer سطح کلاستر" }, { en: "Namespaced Pod", fa: "Pod namespaced" }, { en: "CNI plugin", fa: "افزونه CNI" }], 0, { en: "ClusterIssuer can be referenced from any namespace.", fa: "ClusterIssuer از هر namespace قابل ارجاع است." }),
   ],
   troubleshooting: [
@@ -1657,7 +1657,7 @@ const falcoPack: LearningPack = {
       title: { en: "Syscall to alert", fa: "از syscall تا alert" },
       steps: [
         {
-          caption: { en: "Falco probe observes syscalls in containers on the node.", fa: "probe Falco syscallها در کانتینرهای نود را می‌بیند." },
+          caption: { en: "Falco probe observes syscalls in containers on the node.", fa: "probe Falco syscallها در کانتینرهای Node را می‌بیند." },
           componentIds: ["falco", "app-pod"],
           connectionIds: ["falco-kernel", "falco-pod"],
         },
@@ -1695,13 +1695,13 @@ kubectl -n falco logs -l app.kubernetes.io/name=falco --tail=30 | grep -i shadow
       ),
     ],
     {
-      prompt: { en: "List Falco DaemonSet pods on all nodes.", fa: "Podهای DaemonSet Falco روی همه نودها را لیست کنید." },
+      prompt: { en: "List Falco DaemonSet pods on all nodes.", fa: "Podهای DaemonSet Falco روی همه Nodeها را لیست کنید." },
       solution: { language: "bash", title: "DS", code: `kubectl -n falco get pods -o wide` },
     },
   ),
   quiz: [
     q("falco-q1", { en: "Falco primarily detects…", fa: "Falco عمدتاً … را detect می‌کند" }, [{ en: "Runtime behavior via syscalls/rules", fa: "رفتار runtime via syscall/rule" }, { en: "YAML typos at apply time", fa: "typo YAML هنگام apply" }, { en: "DNS NXDOMAIN", fa: "DNS NXDOMAIN" }], 0, { en: "Falco is runtime detection, not admission.", fa: "Falco تشخیص runtime است نه admission." }),
-    q("falco-q2", { en: "Falco on Kubernetes commonly runs as…", fa: "Falco در Kubernetes معمولاً …" }, [{ en: "DaemonSet", fa: "DaemonSet" }, { en: "CronJob only", fa: "فقط CronJob" }, { en: "Ingress", fa: "Ingress" }], 0, { en: "Needs visibility on every node.", fa: "به دید روی هر نود نیاز دارد." }),
+    q("falco-q2", { en: "Falco on Kubernetes commonly runs as…", fa: "Falco در Kubernetes معمولاً …" }, [{ en: "DaemonSet", fa: "DaemonSet" }, { en: "CronJob only", fa: "فقط CronJob" }, { en: "Ingress", fa: "Ingress" }], 0, { en: "Needs visibility on every node.", fa: "به دید روی هر Node نیاز دارد." }),
     q("falco-q3", { en: "Falco rules are defined in…", fa: "ruleهای Falco در … تعریف می‌شوند" }, [{ en: "YAML rules files", fa: "فایل YAML rule" }, { en: "Ingress annotations only", fa: "فقط annotation Ingress" }, { en: "Corefile", fa: "Corefile" }], 0, { en: "falco_rules.yaml and custom overrides.", fa: "falco_rules.yaml و override سفارشی." }),
   ],
   troubleshooting: [
@@ -1710,7 +1710,7 @@ kubectl -n falco logs -l app.kubernetes.io/name=falco --tail=30 | grep -i shadow
       { en: "Falco pod errors: unable to load probe/driver.", fa: "خطای pod Falco: unable to load probe/driver." },
       [
         { label: { en: "Check kernel version and use modern_ebpf driver if supported", fa: "نسخه kernel و driver modern_ebpf را چک کنید" }, correct: true, feedback: { en: "Probe choice depends on kernel/eBPF support.", fa: "انتخاب probe به kernel/eBPF بستگی دارد." } },
-        { label: { en: "Disable kubelet", fa: "kubelet را خاموش کنید" }, correct: false, feedback: { en: "Breaks the node—fix Falco driver instead.", fa: "نود را می‌شکند—driver Falco را درست کنید." } },
+        { label: { en: "Disable kubelet", fa: "kubelet را خاموش کنید" }, correct: false, feedback: { en: "Breaks the node—fix Falco driver instead.", fa: "Node را می‌شکند—driver Falco را درست کنید." } },
       ],
       [{ language: "bash", title: "Logs", code: `kubectl -n falco logs -l app.kubernetes.io/name=falco --tail=60\nkubectl -n falco describe pod -l app.kubernetes.io/name=falco | tail -20` }],
       { en: "Unsupported kernel, missing headers, or wrong driver in values.", fa: "kernel پشتیبانی نشده، header نیست، یا driver اشتباه در values." },
@@ -1833,7 +1833,7 @@ kubectl label deploy allowed owner=lab --overwrite` },
   ),
   quiz: [
     q("kyv-q1", { en: "Kyverno policies are…", fa: "policyهای Kyverno …" }, [{ en: "Kubernetes CRDs", fa: "CRD Kubernetes" }, { en: "SSH config", fa: "پیکربندی SSH" }, { en: "CNI binaries", fa: "باینری CNI" }], 0, { en: "ClusterPolicy/Policy are kyverno.io resources.", fa: "ClusterPolicy/Policy منابع kyverno.io هستند." }),
-    q("kyv-q2", { en: "validationFailureAction Enforce means…", fa: "validationFailureAction Enforce یعنی …" }, [{ en: "Deny violating requests", fa: "رد درخواست‌های ناقض" }, { en: "Only log to etcd", fa: "فقط log به etcd" }, { en: "Delete nodes", fa: "حذف نودها" }], 0, { en: "Enforce blocks non-compliant creates/updates.", fa: "Enforce ساخت/به‌روزرسانی ناسازگار را block می‌کند." }),
+    q("kyv-q2", { en: "validationFailureAction Enforce means…", fa: "validationFailureAction Enforce یعنی …" }, [{ en: "Deny violating requests", fa: "رد درخواست‌های ناقض" }, { en: "Only log to etcd", fa: "فقط log به etcd" }, { en: "Delete nodes", fa: "حذف Nodeها" }], 0, { en: "Enforce blocks non-compliant creates/updates.", fa: "Enforce ساخت/به‌روزرسانی ناسازگار را block می‌کند." }),
     q("kyv-q3", { en: "Kyverno runs admission as…", fa: "Kyverno admission را به‌صورت …" }, [{ en: "Validating (and mutating) webhooks", fa: "webhook validating (و mutating)" }, { en: "kube-proxy replacement", fa: "جایگزین kube-proxy" }, { en: "CSI driver only", fa: "فقط CSI driver" }], 0, { en: "Webhooks integrate with the API server admission chain.", fa: "webhook در زنجیره admission API server ادغام می‌شود." }),
   ],
   troubleshooting: [

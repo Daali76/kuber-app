@@ -69,14 +69,14 @@ export function SearchClient() {
         <div className="relative">
           <div className="flex gap-2 overflow-x-auto pb-1 pe-6 [scrollbar-width:thin]">
             <FilterChip
-              label="All"
+              label={ui("allLayers")}
               active={layer === "all"}
               onClick={() => setLayer("all")}
             />
             {layers.map((l) => (
               <FilterChip
                 key={l.id}
-                label={l.shortName}
+                label={tr(l.shortName)}
                 active={layer === l.id}
                 onClick={() => setLayer(l.id)}
                 accent={l.accent}
@@ -96,7 +96,7 @@ export function SearchClient() {
         </p>
         <div className="flex flex-wrap gap-2">
           <FilterChip
-            label="All"
+            label={ui("allLayers")}
             active={maturity === "all"}
             onClick={() => setMaturity("all")}
           />
@@ -136,7 +136,7 @@ export function SearchClient() {
                     <MaturityBadge maturity={tool.maturity} />
                   </span>
                   <span className="mt-0.5 block text-sm text-slate-400">
-                    {tool.summary}
+                    {tr(tool.summary)}
                   </span>
                 </span>
               </Link>

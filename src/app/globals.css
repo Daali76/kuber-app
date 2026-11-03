@@ -5,6 +5,19 @@
   --foreground: #e8eef7;
   --surface: #0d1420;
   --muted: #94a3b8;
+  --base-font: 16px;
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --base-font: 17px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --base-font: 18px;
+  }
 }
 
 @theme inline {
@@ -17,6 +30,7 @@
 
 html {
   color-scheme: dark;
+  font-size: var(--base-font);
 }
 
 body {
@@ -24,14 +38,20 @@ body {
   color: var(--foreground);
   font-family: var(--font-body), ui-sans-serif, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  line-height: 1.6;
+  overflow-x: hidden;
 }
 
 html.lang-fa body {
   font-family: var(--font-fa), var(--font-body), ui-sans-serif, sans-serif;
+  line-height: 1.85;
 }
 
+html.lang-fa h1,
+html.lang-fa h2,
+html.lang-fa h3,
 html.lang-fa .font-\[family-name\:var\(--font-display\)\] {
-  font-family: var(--font-fa), var(--font-display), sans-serif;
+  font-family: var(--font-fa), sans-serif;
 }
 
 /* Desktop / Mac Chrome: clearer focus + smoother hover */
@@ -47,17 +67,30 @@ html.lang-fa .font-\[family-name\:var\(--font-display\)\] {
   outline-offset: 2px;
 }
 
-/* Keep SVG diagrams readable on wide Mac / Chrome displays */
+/* Diagram fills its column; no artificial max-width cap */
 .diagram-frame {
   width: 100%;
-  max-width: 24rem;
-  margin-inline: auto;
+  margin-inline: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1280px) {
   .diagram-frame {
-    max-width: 28rem;
+    min-height: 70vh;
   }
+
+  .diagram-frame svg {
+    min-height: 70vh;
+  }
+}
+
+.heading-hero {
+  font-size: clamp(1.75rem, 2vw + 1rem, 3rem);
+  line-height: 1.15;
+}
+
+.heading-page {
+  font-size: clamp(1.5rem, 1.2vw + 1rem, 2.25rem);
+  line-height: 1.2;
 }
 
 @keyframes layer-in {

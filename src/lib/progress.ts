@@ -94,6 +94,8 @@ export function importProgress(json: string): boolean {
       labSteps: parsed.labSteps ?? {},
       quizScores: parsed.quizScores ?? {},
       flashcards: parsed.flashcards ?? {},
+      objectives: parsed.objectives ?? {},
+      modules: parsed.modules ?? {},
       continue: parsed.continue,
     });
     return true;

@@ -10,6 +10,7 @@ import {
   type BuilderInput,
 } from "@/lib/stack-builder";
 import type { Environment, Priority, Scale, TeamSize } from "@/lib/types";
+import { useI18n } from "@/lib/i18n";
 
 const teamOptions: { id: TeamSize; label: string }[] = [
   { id: "solo", label: "Solo" },
@@ -37,6 +38,7 @@ const priorityOptions: { id: Priority; label: string }[] = [
 ];
 
 export function BuilderClient() {
+  const { tr } = useI18n();
   const [teamSize, setTeamSize] = useState<TeamSize>("small");
   const [scale, setScale] = useState<Scale>("medium");
   const [environment, setEnvironment] = useState<Environment>("cloud");
@@ -155,7 +157,7 @@ export function BuilderClient() {
                       {pick.tool.name}
                     </Link>
                     <span className="text-xs text-slate-500">
-                      · {layer.shortName}
+                      · {tr(layer.shortName)}
                     </span>
                   </div>
                   <p className="text-sm text-slate-400">{pick.reason}</p>

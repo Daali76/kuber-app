@@ -16,7 +16,7 @@ export async function generateMetadata({
   if (!tool) return { title: "Tool" };
   return {
     title: tool.name,
-    description: tool.summary,
+    description: tool.summary.en,
   };
 }
 

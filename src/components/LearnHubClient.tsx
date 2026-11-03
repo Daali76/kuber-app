@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useSyncExternalStore } from "react";
-import { lessons } from "@data/lessons";
+import { lessons, learnModules, moduleProgressPercent } from "@data/lessons";
 import { useI18n } from "@/lib/i18n";
 import {
   getProgressSnapshot,
@@ -20,7 +20,22 @@ export function LearnHubClient() {
   const progress = useMemo(() => parseProgress(raw), [raw]);
   const done = lessons.filter((l) => progress.lessons[l.id]).length;
 
+  const sortedModules = useMemo(
+    () => [...learnModules].sort((a, b) => a.order - b.order),
+    [],
+  );
+
+  const lessonById = useMemo(
+    () => new Map(lessons.map((l) => [l.id, l])),
+    [],
+  );
+
   const cards = [
+    {
+      href: "/strategies",
+      title: ui("strategiesCard"),
+      desc: ui("strategiesCardDesc"),
+    },
     { href: "/builder", title: ui("builderCard"), desc: ui("builderCardDesc") },
     { href: "/compare", title: ui("compareCard"), desc: ui("compareCardDesc") },
     { href: "/review", title: ui("reviewCard"), desc: ui("reviewCardDesc") },
@@ -38,6 +53,68 @@ export function LearnHubClient() {
           {ui("progress")}: {done} / {lessons.length}
         </p>
       </div>
+
+      <section>
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+          {ui("modules")}
+        </h2>
+        <div className="space-y-3">
+          {sortedModules.map((mod) => {
+            const pct = moduleProgressPercent(mod.id, progress);
+            return (
+              <div
+                key={mod.id}
+                className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h3 className="font-semibold text-slate-50">{tr(mod.title)}</h3>
+                  <span className="text-xs font-medium text-teal-300/90">
+                    {pct}%
+                  </span>
+                </div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/40">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-teal-400 to-sky-400 transition-all"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <ul className="mt-3 space-y-1">
+                  {mod.lessonIds.map((lid) => {
+                    const lesson = lessonById.get(lid);
+                    if (!lesson) return null;
+                    const complete = !!progress.lessons[lid];
+                    return (
+                      <li key={lid}>
+                        <Link
+                          href={`/learn/${lid}`}
+                          className="flex min-h-11 items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-white/[0.04]"
+                        >
+                          <span
+                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
+                              complete
+                                ? "bg-teal-400/20 text-teal-200"
+                                : "bg-black/30 text-slate-500"
+                            }`}
+                          >
+                            {complete ? "✓" : "·"}
+                          </span>
+                          <span
+                            className={
+                              complete ? "text-slate-400" : "text-slate-200"
+                            }
+                          >
+                            {tr(lesson.title)}
+                          </span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       <section>
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">

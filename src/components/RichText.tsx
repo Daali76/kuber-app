@@ -10,6 +10,19 @@ function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function wrapLatinRuns(text: string, keyBase: number): React.ReactNode[] {
+  const parts = text.split(/([A-Za-z][A-Za-z0-9./:_-]*)/g);
+  return parts.map((part, i) =>
+    /^[A-Za-z]/.test(part) ? (
+      <bdi key={`${keyBase}-l-${i}`} dir="ltr">
+        {part}
+      </bdi>
+    ) : (
+      <span key={`${keyBase}-t-${i}`}>{part}</span>
+    ),
+  );
+}
+
 export function RichText({
   text,
   className,
@@ -33,7 +46,10 @@ export function RichText({
     let key = 0;
     while ((match = pattern.exec(content)) !== null) {
       if (match.index > last) {
-        parts.push(content.slice(last, match.index));
+        const chunk = content.slice(last, match.index);
+        parts.push(
+          ...(lang === "fa" ? wrapLatinRuns(chunk, key++) : [chunk]),
+        );
       }
       const word = match[1]!;
       const term =
@@ -50,15 +66,26 @@ export function RichText({
             className="underline decoration-teal-400/50 decoration-dotted underline-offset-2 text-teal-100"
             onClick={() => setActive(term)}
           >
-            {word}
+            <bdi dir="ltr">{word}</bdi>
           </button>,
         );
       } else {
-        parts.push(word);
+        parts.push(
+          lang === "fa" ? (
+            <bdi key={`w-${key++}`} dir="ltr">
+              {word}
+            </bdi>
+          ) : (
+            word
+          ),
+        );
       }
       last = match.index + word.length;
     }
-    if (last < content.length) parts.push(content.slice(last));
+    if (last < content.length) {
+      const chunk = content.slice(last);
+      parts.push(...(lang === "fa" ? wrapLatinRuns(chunk, key++) : [chunk]));
+    }
     return parts;
   }, [content, lang]);
 

@@ -7,7 +7,7 @@ import { ClusterDiagram } from "@/components/cluster/ClusterDiagram";
 import { useI18n } from "@/lib/i18n";
 
 export function CompareClient() {
-  const { ui, lang } = useI18n();
+  const { ui, tr } = useI18n();
   const [a, setA] = useState(tools[0]!.id);
   const [b, setB] = useState(tools[1]!.id);
   const toolA = useMemo(() => tools.find((t) => t.id === a)!, [a]);
@@ -15,11 +15,6 @@ export function CompareClient() {
 
   return (
     <div className="space-y-4">
-      {lang === "fa" ? (
-        <p className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-sm text-amber-100">
-          {ui("translationPending")}
-        </p>
-      ) : null}
       <p className="text-sm text-slate-400">{ui("pickTwo")}</p>
       <div className="grid gap-2 sm:grid-cols-2">
         <select
@@ -57,15 +52,27 @@ export function CompareClient() {
           </thead>
           <tbody className="text-slate-200">
             <Row
-              label="Layer"
-              left={getLayer(toolA.layer)?.shortName ?? toolA.layer}
-              right={getLayer(toolB.layer)?.shortName ?? toolB.layer}
+              label={ui("layer")}
+              left={
+                getLayer(toolA.layer)
+                  ? tr(getLayer(toolA.layer)!.shortName)
+                  : toolA.layer
+              }
+              right={
+                getLayer(toolB.layer)
+                  ? tr(getLayer(toolB.layer)!.shortName)
+                  : toolB.layer
+              }
             />
-            <Row label="Maturity" left={toolA.maturity} right={toolB.maturity} />
             <Row
-              label="Deploy model"
-              left={toolA.placementBlurb}
-              right={toolB.placementBlurb}
+              label={ui("maturity")}
+              left={toolA.maturity}
+              right={toolB.maturity}
+            />
+            <Row
+              label={ui("typicalPlacement")}
+              left={tr(toolA.placementBlurb)}
+              right={tr(toolB.placementBlurb)}
             />
             <Row
               label="Components"
@@ -79,14 +86,14 @@ export function CompareClient() {
                 .join(", ")}
             />
             <Row
-              label="When to use"
-              left={toolA.useWhen[0] ?? "—"}
-              right={toolB.useWhen[0] ?? "—"}
+              label={ui("useWhen")}
+              left={toolA.useWhen[0] ? tr(toolA.useWhen[0]) : "—"}
+              right={toolB.useWhen[0] ? tr(toolB.useWhen[0]) : "—"}
             />
             <Row
-              label="Complexity"
-              left={toolA.levels.advanced.slice(0, 80) + "…"}
-              right={toolB.levels.advanced.slice(0, 80) + "…"}
+              label={ui("advanced")}
+              left={tr(toolA.levels.advanced).slice(0, 80) + "…"}
+              right={tr(toolB.levels.advanced).slice(0, 80) + "…"}
             />
           </tbody>
         </table>

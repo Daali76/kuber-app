@@ -1,5 +1,8 @@
+"use client";
+
 import { ToolChip } from "@/components/ToolChip";
 import type { LayerMeta, Tool } from "@/lib/types";
+import { useI18n } from "@/lib/i18n";
 
 export function LayerCard({
   layer,
@@ -10,6 +13,7 @@ export function LayerCard({
   tools: Tool[];
   index: number;
 }) {
+  const { tr } = useI18n();
   return (
     <section
       className="layer-enter rounded-2xl border border-white/10 p-4"
@@ -27,10 +31,12 @@ export function LayerCard({
           {layer.order}
         </div>
         <div className="min-w-0">
-          <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-slate-50">
-            {layer.name}
+          <h2 className="heading-section text-lg font-semibold tracking-tight text-slate-50">
+            {tr(layer.name)}
           </h2>
-          <p className="mt-0.5 text-sm text-slate-400">{layer.description}</p>
+          <p className="mt-0.5 text-base text-slate-400">
+            {tr(layer.description)}
+          </p>
         </div>
       </div>
       <div className="flex flex-wrap gap-2">

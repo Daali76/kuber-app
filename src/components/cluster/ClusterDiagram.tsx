@@ -9,10 +9,11 @@ import type {
 } from "@/lib/types";
 import { ComponentInfoCard } from "@/components/cluster/ComponentInfoCard";
 import {
-  COMP_BOX,
   COMP_HIT,
+  ZONE_LABEL,
   computeDiagramLayout,
-  curvePath,
+  connectionLabelLayout,
+  orthogonalPath,
   wrapLabel,
 } from "@/components/cluster/layout";
 import { useI18n } from "@/lib/i18n";
@@ -25,6 +26,14 @@ const ZONES = [
   "pod",
 ] as const;
 
+const ZONE_LABEL_FA: Record<(typeof ZONES)[number], string> = {
+  external: "External (بیرون کلاستر)",
+  "control-plane": "Control plane",
+  "worker-node": "Worker node",
+  namespace: "Namespace / Service",
+  pod: "Pod",
+};
+
 export function ClusterDiagram({
   components,
   connections,
@@ -35,6 +44,9 @@ export function ClusterDiagram({
   navigateOnSelect,
   flows,
   beforeAfter,
+  selectedId: controlledSelected,
+  onSelect,
+  infoVariant = "auto",
 }: {
   components: DiagramComponent[];
   connections: DiagramConnection[];
@@ -48,20 +60,48 @@ export function ClusterDiagram({
     beforeComponentIds: string[];
     afterComponentIds: string[];
   };
+  selectedId?: string | null;
+  onSelect?: (id: string | null) => void;
+  /** auto: sheet on small, none when onSelect provided on xl parent */
+  infoVariant?: "auto" | "sheet" | "none";
 }) {
   const router = useRouter();
-  const { tr, ui } = useI18n();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { tr, ui, lang } = useI18n();
+  const [internalSelected, setInternalSelected] = useState<string | null>(null);
+  const selectedId =
+    controlledSelected !== undefined ? controlledSelected : internalSelected;
+  const setSelectedId = (id: string | null) => {
+    onSelect?.(id);
+    if (controlledSelected === undefined) setInternalSelected(id);
+  };
+
   const [mode, setMode] = useState<"after" | "before">("after");
   const [playing, setPlaying] = useState(false);
-  const [flowIndex, setFlowIndex] = useState(0);
+  const [flowIndex] = useState(0);
   const [stepIndex, setStepIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
 
-  const layout = useMemo(() => computeDiagramLayout(components), [components]);
-  const { positions, zones, view } = layout;
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1280px)");
+    const apply = () => setIsDesktop(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  const fontSize = isDesktop ? 14 : 12;
+  const layout = useMemo(
+    () => computeDiagramLayout(components, fontSize),
+    [components, fontSize],
+  );
+  const { positions, zones, view, boxes } = layout;
+  const edgeLabels = useMemo(
+    () => connectionLabelLayout(connections, positions, boxes, fontSize - 1),
+    [connections, positions, boxes, fontSize],
+  );
+
   const selected = components.find((c) => c.id === selectedId) ?? null;
   const activeFlow = flows?.[flowIndex];
-
   const playStep = playing && activeFlow ? activeFlow.steps[stepIndex] : null;
 
   const focusComps = useMemo(() => {
@@ -94,7 +134,7 @@ export function ClusterDiagram({
   }
 
   useEffect(() => {
-    if (!selectedId) return;
+    if (!selectedId || isDesktop) return;
     const el = document.getElementById(`diagram-comp-${selectedId}`);
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -106,14 +146,15 @@ export function ClusterDiagram({
       const delta = rect.top + rect.height / 2 - mid;
       window.scrollBy({ top: delta, behavior: "smooth" });
     }
-  }, [selectedId]);
+  }, [selectedId, isDesktop]);
 
-  const { w: boxW, h: boxH } = COMP_BOX;
-  const hitPadX = Math.max(0, (COMP_HIT - boxW) / 2);
-  const hitPadY = Math.max(0, (COMP_HIT - boxH) / 2);
+  const showSheet =
+    selected &&
+    infoVariant !== "none" &&
+    (infoVariant === "sheet" || (infoVariant === "auto" && !isDesktop));
 
   return (
-    <div className="relative">
+    <div className="relative" data-testid="cluster-diagram">
       {title ? (
         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
           {title}
@@ -130,7 +171,7 @@ export function ClusterDiagram({
                   setMode("before");
                   setPlaying(false);
                 }}
-                className={`min-h-10 rounded-lg border px-3 text-sm font-medium ${
+                className={`min-h-11 rounded-lg border px-3 text-[15px] font-medium ${
                   mode === "before" && !playing
                     ? "border-sky-400/40 bg-sky-400/15 text-sky-100"
                     : "border-white/10 text-slate-300"
@@ -144,7 +185,7 @@ export function ClusterDiagram({
                   setMode("after");
                   setPlaying(false);
                 }}
-                className={`min-h-10 rounded-lg border px-3 text-sm font-medium ${
+                className={`min-h-11 rounded-lg border px-3 text-[15px] font-medium ${
                   mode === "after" && !playing
                     ? "border-sky-400/40 bg-sky-400/15 text-sky-100"
                     : "border-white/10 text-slate-300"
@@ -161,7 +202,7 @@ export function ClusterDiagram({
                 setPlaying((p) => !p);
                 setStepIndex(0);
               }}
-              className={`min-h-10 rounded-lg border px-3 text-sm font-medium ${
+              className={`min-h-11 rounded-lg border px-3 text-[15px] font-medium ${
                 playing
                   ? "border-teal-400/40 bg-teal-400/15 text-teal-100"
                   : "border-white/10 text-slate-300"
@@ -178,13 +219,13 @@ export function ClusterDiagram({
           <p className="text-xs font-semibold uppercase tracking-wider text-teal-200">
             {tr(activeFlow.title)} · {stepIndex + 1}/{activeFlow.steps.length}
           </p>
-          <p className="mt-1 text-sm text-slate-200">
+          <p className="mt-1 text-base text-slate-200">
             {tr(activeFlow.steps[stepIndex]!.caption)}
           </p>
           <div className="mt-2 flex gap-2">
             <button
               type="button"
-              className="min-h-10 rounded-lg border border-white/10 px-3 text-sm text-slate-200"
+              className="min-h-11 rounded-lg border border-white/10 px-3 text-[15px] text-slate-200"
               disabled={stepIndex === 0}
               onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
             >
@@ -192,7 +233,7 @@ export function ClusterDiagram({
             </button>
             <button
               type="button"
-              className="min-h-10 rounded-lg border border-white/10 px-3 text-sm text-slate-200"
+              className="min-h-11 rounded-lg border border-white/10 px-3 text-[15px] text-slate-200"
               disabled={stepIndex >= activeFlow.steps.length - 1}
               onClick={() =>
                 setStepIndex((i) =>
@@ -202,32 +243,18 @@ export function ClusterDiagram({
             >
               {ui("next")}
             </button>
-            {flows && flows.length > 1 ? (
-              <select
-                className="min-h-10 rounded-lg border border-white/10 bg-black/40 px-2 text-sm text-slate-200"
-                value={flowIndex}
-                onChange={(e) => {
-                  setFlowIndex(Number(e.target.value));
-                  setStepIndex(0);
-                }}
-              >
-                {flows.map((f, i) => (
-                  <option key={f.id} value={i}>
-                    {tr(f.title)}
-                  </option>
-                ))}
-              </select>
-            ) : null}
           </div>
         </div>
       ) : null}
 
-      <div className="diagram-frame overflow-hidden rounded-2xl border border-white/10 bg-[#070d16] shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
+      {/* Geometry always LTR — prevents FA bidi clipping */}
+      <div dir="ltr" className="diagram-frame overflow-hidden rounded-2xl border border-white/10 bg-[#070d16]">
         <svg
           viewBox={`0 0 ${view.w} ${view.h}`}
           className="h-auto w-full"
           role="img"
           aria-label="Kubernetes cluster placement diagram"
+          data-testid="cluster-diagram-svg"
         >
           <defs>
             <marker
@@ -263,6 +290,8 @@ export function ClusterDiagram({
 
           {ZONES.map((z) => {
             const box = zones[z];
+            const label =
+              lang === "fa" ? ZONE_LABEL_FA[z] : ZONE_LABEL[z];
             return (
               <g key={z}>
                 <rect
@@ -276,15 +305,15 @@ export function ClusterDiagram({
                   strokeWidth={1}
                 />
                 <text
-                  x={box.x + 12}
-                  y={box.y + 18}
+                  x={box.x + 14}
+                  y={box.y + 20}
                   fill="#64748b"
-                  fontSize={12}
+                  fontSize={fontSize}
                   fontFamily="var(--font-body), sans-serif"
                   fontWeight={600}
-                  letterSpacing="0.12em"
+                  letterSpacing="0.08em"
                 >
-                  {box.label.toUpperCase()}
+                  {label.toUpperCase()}
                 </text>
               </g>
             );
@@ -295,35 +324,36 @@ export function ClusterDiagram({
             const b = positions[conn.to];
             if (!a || !b) return null;
             const active = isConnActive(conn);
-            const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 - 6 };
+            const pill = edgeLabels[conn.id];
             return (
               <g key={conn.id} opacity={active ? 1 : 0.22}>
                 <path
-                  d={curvePath(a, b)}
+                  d={orthogonalPath(a, b)}
                   fill="none"
                   stroke={active ? accent : "#64748b"}
                   strokeWidth={active ? 2 : 1.2}
                   markerEnd={active ? "url(#arrow-hot)" : "url(#arrow)"}
                   className={active ? "flow-dash" : undefined}
                   strokeDasharray={active ? "6 8" : undefined}
+                  data-testid={`edge-${conn.id}`}
                 />
-                {active ? (
-                  <g>
+                {active && pill ? (
+                  <g data-testid={`edge-label-${conn.id}`}>
                     <rect
-                      x={mid.x - conn.label.length * 3.2}
-                      y={mid.y - 10}
-                      width={Math.max(40, conn.label.length * 6.4)}
-                      height={16}
+                      x={pill.x}
+                      y={pill.y}
+                      width={pill.w}
+                      height={pill.h}
                       rx={4}
                       fill="#0b1220"
                       stroke={`${accent}55`}
                     />
                     <text
-                      x={mid.x}
-                      y={mid.y + 2}
+                      x={pill.x + pill.w / 2}
+                      y={pill.y + pill.h / 2 + 4}
                       textAnchor="middle"
                       fill={accent}
-                      fontSize={11}
+                      fontSize={fontSize - 1}
                       fontFamily="var(--font-mono), monospace"
                     >
                       {conn.label}
@@ -335,20 +365,23 @@ export function ClusterDiagram({
           })}
 
           {components.map((c) => {
+            const box = boxes[c.id];
             const p = positions[c.id];
-            if (!p) return null;
+            if (!box || !p) return null;
             const active = isCompActive(c);
             const isSelected = selectedId === c.id;
-            const lines = wrapLabel(c.label);
+            const lines = wrapLabel(c.label, isDesktop ? 18 : 14);
+            const hitPadX = Math.max(0, (COMP_HIT - box.w) / 2);
+            const hitPadY = Math.max(0, (COMP_HIT - box.h) / 2);
             return (
               <g
                 key={c.id}
                 id={`diagram-comp-${c.id}`}
-                transform={`translate(${p.x - boxW / 2}, ${p.y - boxH / 2})`}
+                transform={`translate(${box.x}, ${box.y})`}
                 opacity={active || isSelected ? 1 : 0.35}
                 filter={active ? "url(#glow)" : undefined}
-                className="cursor-pointer transition-opacity hover:opacity-100"
-                style={{ outline: "none" }}
+                className="cursor-pointer"
+                data-testid={`diagram-comp-${c.id}`}
                 onClick={() => {
                   const href = navigateOnSelect?.[c.id];
                   if (href) {
@@ -372,13 +405,13 @@ export function ClusterDiagram({
                 <rect
                   x={-hitPadX}
                   y={-hitPadY}
-                  width={boxW + hitPadX * 2}
-                  height={boxH + hitPadY * 2}
+                  width={box.w + hitPadX * 2}
+                  height={box.h + hitPadY * 2}
                   fill="transparent"
                 />
                 <rect
-                  width={boxW}
-                  height={boxH}
+                  width={box.w}
+                  height={box.h}
                   rx={8}
                   fill={active ? `${accent}22` : "rgba(15,23,42,0.9)"}
                   stroke={
@@ -387,21 +420,25 @@ export function ClusterDiagram({
                   strokeWidth={isSelected ? 2 : 1.2}
                 />
                 <circle
-                  cx={10}
-                  cy={boxH / 2}
-                  r={3}
+                  cx={12}
+                  cy={box.h / 2}
+                  r={3.5}
                   fill={active ? accent : "#64748b"}
                 />
                 <text
-                  x={18}
-                  y={lines.length > 1 ? boxH / 2 - 5 : boxH / 2 + 4}
+                  x={22}
+                  y={
+                    lines.length > 1
+                      ? box.h / 2 - ((lines.length - 1) * (fontSize + 2)) / 2
+                      : box.h / 2 + fontSize / 3
+                  }
                   fill="#e2e8f0"
-                  fontSize={12}
+                  fontSize={fontSize}
                   fontFamily="var(--font-body), sans-serif"
                   fontWeight={600}
                 >
                   {lines.map((line, i) => (
-                    <tspan key={i} x={18} dy={i === 0 ? 0 : 13}>
+                    <tspan key={i} x={22} dy={i === 0 ? 0 : fontSize + 2}>
                       {line}
                     </tspan>
                   ))}
@@ -411,14 +448,13 @@ export function ClusterDiagram({
           })}
         </svg>
       </div>
-      <p className="mt-2 text-center text-[11px] text-slate-500">
-        Select a highlighted box for object type & why it runs there
-      </p>
-      {selected ? (
+
+      {showSheet ? (
         <ComponentInfoCard
-          component={selected}
+          component={selected!}
           accent={accent}
           onClose={() => setSelectedId(null)}
+          variant="sheet"
         />
       ) : null}
     </div>

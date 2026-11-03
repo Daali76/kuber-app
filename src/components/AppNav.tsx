@@ -29,7 +29,7 @@ export function AppNav() {
         className="sticky top-0 z-50 hidden border-b border-white/10 bg-[#070b12]/90 backdrop-blur-xl md:block"
         aria-label="Primary"
       >
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-6">
+        <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-6 px-6">
           <Link
             href="/"
             className="font-[family-name:var(--font-display)] text-sm font-bold tracking-tight text-slate-50 transition hover:text-teal-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400"
@@ -45,7 +45,7 @@ export function AppNav() {
                   <li key={href}>
                     <Link
                       href={href}
-                      className={`inline-flex min-h-10 items-center gap-2 rounded-xl px-3.5 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 ${
+                      className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-3.5 text-[15px] font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 ${
                         active
                           ? "bg-teal-400/15 text-teal-200"
                           : "text-slate-400 hover:bg-white/[0.05] hover:text-slate-100"
@@ -75,7 +75,7 @@ export function AppNav() {
               <li key={href} className="flex-1">
                 <Link
                   href={href}
-                  className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-2 text-[11px] font-medium tracking-wide transition-colors ${
+                  className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-2 text-[12px] font-medium tracking-wide transition-colors ${
                     active
                       ? "text-teal-300"
                       : "text-slate-400 active:text-slate-200"

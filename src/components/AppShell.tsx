@@ -33,18 +33,18 @@ export function AppShell({
       <AppNav />
 
       <header className="relative z-10 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))] md:px-6 md:pt-8">
-        <div className="mx-auto flex max-w-6xl items-start justify-between gap-3">
+        <div className="mx-auto flex w-full max-w-[1440px] items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="font-[family-name:var(--font-display)] text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-300/90 md:hidden">
               {ui("brand")}
             </p>
             {title ? (
-              <h1 className="mt-1 font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-slate-50 sm:text-3xl md:mt-0 md:text-4xl">
+              <h1 className="heading-page mt-1 font-[family-name:var(--font-display)] font-semibold tracking-tight text-slate-50 md:mt-0">
                 {title}
               </h1>
             ) : null}
             {subtitle ? (
-              <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-400 md:text-base">
+              <p className="mt-1 max-w-3xl text-base leading-relaxed text-slate-400">
                 {subtitle}
               </p>
             ) : null}
@@ -55,7 +55,7 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-2 md:px-6 md:pb-12 md:pt-4">
+      <main className="relative z-10 mx-auto w-full max-w-[1440px] flex-1 px-4 pb-28 pt-2 md:px-6 md:pb-12 md:pt-4">
         {children}
       </main>
     </div>

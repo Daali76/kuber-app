@@ -1,57 +1,62 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Tool } from "@/lib/types";
+import type { ImplementStep, ToolDiagram } from "@/lib/types";
 import { ClusterDiagram } from "@/components/cluster/ClusterDiagram";
 import { CodeBlock } from "@/components/CodeBlock";
+import { RichText } from "@/components/RichText";
+import { useI18n } from "@/lib/i18n";
 
 export function ImplementGuide({
-  tool,
+  implement,
+  diagram,
   accent,
 }: {
-  tool: Tool;
+  implement: ImplementStep[];
+  diagram: ToolDiagram;
   accent: string;
 }) {
   const [stepIndex, setStepIndex] = useState(0);
-  const step = tool.implement[stepIndex];
+  const step = implement[stepIndex]!;
+  const { ui, tr } = useI18n();
 
   const focusComponentIds = useMemo(() => {
     const ids = new Set<string>();
     for (let i = 0; i <= stepIndex; i++) {
-      tool.implement[i]?.diagramComponentIds.forEach((id) => ids.add(id));
+      implement[i]?.diagramComponentIds.forEach((id) => ids.add(id));
     }
     return [...ids];
-  }, [tool, stepIndex]);
+  }, [implement, stepIndex]);
 
   const focusConnectionIds = useMemo(() => {
     const ids = new Set<string>();
     for (let i = 0; i <= stepIndex; i++) {
-      tool.implement[i]?.diagramConnectionIds?.forEach((id) => ids.add(id));
+      implement[i]?.diagramConnectionIds?.forEach((id) => ids.add(id));
     }
     return [...ids];
-  }, [tool, stepIndex]);
+  }, [implement, stepIndex]);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,32rem)_minmax(0,1fr)] lg:items-start lg:gap-8">
-      <div className="lg:sticky lg:top-20">
+    <div className="space-y-4">
+      <div className="xl:hidden">
         <ClusterDiagram
-          components={tool.diagram.components}
-          connections={tool.diagram.connections}
+          components={diagram.components}
+          connections={diagram.connections}
           accent={accent}
           focusComponentIds={focusComponentIds}
           focusConnectionIds={focusConnectionIds}
-          title={`Build-up · step ${stepIndex + 1}/${tool.implement.length}`}
+          title={`${ui("buildUp")} · ${ui("stepOf")} ${stepIndex + 1}/${implement.length}`}
         />
       </div>
 
       <div className="space-y-4">
         <div className="flex gap-2 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible">
-          {tool.implement.map((s, i) => (
+          {implement.map((s, i) => (
             <button
               key={s.id}
               type="button"
               onClick={() => setStepIndex(i)}
-              className={`min-h-11 shrink-0 rounded-xl border px-3 text-sm font-medium transition hover:border-white/25 ${
+              className={`min-h-11 shrink-0 rounded-xl border px-3 text-[15px] font-medium transition hover:border-white/25 ${
                 i === stepIndex
                   ? "border-teal-400/40 bg-teal-400/15 text-teal-100"
                   : i < stepIndex
@@ -59,7 +64,7 @@ export function ImplementGuide({
                     : "border-white/10 bg-black/20 text-slate-400"
               }`}
             >
-              {i + 1}. {s.title}
+              {i + 1}. {tr(s.title)}
             </button>
           ))}
         </div>
@@ -72,22 +77,22 @@ export function ImplementGuide({
             >
               {stepIndex + 1}
             </span>
-            <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-slate-50 md:text-xl">
-              {step.title}
+            <h2 className="heading-section text-lg font-semibold text-slate-50 md:text-xl">
+              {tr(step.title)}
             </h2>
           </div>
-          <p className="text-sm leading-relaxed text-slate-400 md:text-[15px]">
-            {step.description}
+          <p className="text-base leading-relaxed text-slate-400">
+            <RichText text={step.description} />
           </p>
           {step.code ? (
-            <div className="mt-3">
+            <div className="mt-3" dir="ltr">
               <CopyableCode example={step.code} />
             </div>
           ) : null}
           {step.expectedOutput ? (
-            <div className="mt-3">
+            <div className="mt-3" dir="ltr">
               <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                Expected output
+                {ui("expected")}
               </p>
               <pre className="overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-3 font-[family-name:var(--font-mono)] text-[12px] text-lime-200/90 md:text-[13px]">
                 {step.expectedOutput}
@@ -99,20 +104,20 @@ export function ImplementGuide({
               type="button"
               disabled={stepIndex === 0}
               onClick={() => setStepIndex((v) => Math.max(0, v - 1))}
-              className="min-h-11 flex-1 rounded-xl border border-white/10 text-sm text-slate-300 transition hover:bg-white/[0.04] disabled:opacity-40"
+              className="min-h-11 flex-1 rounded-xl border border-white/10 text-[15px] text-slate-300 transition hover:bg-white/[0.04] disabled:opacity-40"
             >
-              Previous
+              {ui("prev")}
             </button>
             <button
               type="button"
-              disabled={stepIndex >= tool.implement.length - 1}
+              disabled={stepIndex >= implement.length - 1}
               onClick={() =>
-                setStepIndex((v) => Math.min(tool.implement.length - 1, v + 1))
+                setStepIndex((v) => Math.min(implement.length - 1, v + 1))
               }
-              className="min-h-11 flex-1 rounded-xl text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-40"
+              className="min-h-11 flex-1 rounded-xl text-[15px] font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-40"
               style={{ background: accent }}
             >
-              Next
+              {ui("next")}
             </button>
           </div>
         </article>
@@ -124,7 +129,7 @@ export function ImplementGuide({
 function CopyableCode({
   example,
 }: {
-  example: NonNullable<Tool["implement"][number]["code"]>;
+  example: NonNullable<ImplementStep["code"]>;
 }) {
   const [copied, setCopied] = useState(false);
 

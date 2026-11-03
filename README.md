@@ -23,6 +23,21 @@ npm run build
 npm start
 ```
 
+## CNCF Landscape catalog (Phase 3)
+
+```bash
+npm run import:landscape              # YAML + CNCF-project logos
+npm run import:landscape -- --skip-logos   # JSON only (faster)
+npm run lint:fa
+npm run test:e2e
+```
+
+`import:landscape` downloads [landscape.yml](https://github.com/cncf/landscape), skips **CNCF Members**, writes [`data/landscape/catalog.json`](data/landscape/catalog.json) (~1722 items; maturity printed to stdout), and copies referenced **CNCF project** logos into `public/logos/` (SVGO when installed). Fails if logos exceed **5 MB**. Commit the generated JSON + logos for offline deterministic builds.
+
+Browse `/catalog` and `/catalog/[id]`. Deep guides: see [`docs/roadmap.md`](docs/roadmap.md). Persian copy: [`docs/fa-style-guide.md`](docs/fa-style-guide.md).
+
+**Build note (measured):** `npm run build` (~21s webpack) exports **1722** catalog pages; `out/` ≈ **110 MB** with logos. Turbopack build is flaky at this page count — the npm script forces `--webpack`.
+
 ## Static export
 
 `next.config.ts` uses `output: "export"` (images unoptimized). `npm run build` writes a static site to `out/`.

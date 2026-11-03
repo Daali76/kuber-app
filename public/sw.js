@@ -1,5 +1,5 @@
 /* Cloud Native Atlas — offline service worker (static export). */
-const CACHE_NAME = "cna-learn-v2";
+const CACHE_NAME = "cna-learn-v3";
 
 const PRECACHE_ROUTES = [
   "/",
@@ -7,6 +7,17 @@ const PRECACHE_ROUTES = [
   "/builder",
   "/search",
   "/learn",
+  "/strategies",
+  "/strategies/rolling-update",
+  "/strategies/recreate",
+  "/strategies/canary-argo-rollouts",
+  "/strategies/blue-green-argo-rollouts",
+  "/strategies/compare-strategies",
+  "/strategies/argocd-application",
+  "/strategies/app-of-apps",
+  "/strategies/applicationset",
+  "/strategies/kustomize-argocd",
+  "/strategies/helm-vs-kustomize",
   "/learn/container-image",
   "/learn/pod",
   "/learn/node-kubelet",
@@ -87,11 +98,47 @@ async function cacheFirst(request) {
   return res;
 }
 
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request, { ignoreSearch: true });
+  const network = fetch(request)
+    .then((res) => {
+      if (res.ok && request.method === "GET") {
+        cache.put(request, res.clone());
+      }
+      return res;
+    })
+    .catch(() => cached);
+  return cached || network;
+}
+
+function isStaleWhileRevalidatePath(pathname) {
+  return (
+    pathname.startsWith("/catalog/") ||
+    pathname === "/catalog" ||
+    pathname.startsWith("/logos/")
+  );
+}
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
+  if (isStaleWhileRevalidatePath(url.pathname)) {
+    event.respondWith(
+      staleWhileRevalidate(request).catch(async () => {
+        const cache = await caches.open(CACHE_NAME);
+        return (
+          (await cache.match(url.pathname)) ||
+          (await cache.match("/")) ||
+          Response.error()
+        );
+      }),
+    );
+    return;
+  }
 
   const isStatic =
     url.pathname.startsWith("/_next/static/") ||

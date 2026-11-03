@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useSyncExternalStore } from "react";
-import type { Lab, Tool } from "@/lib/types";
+import type { Lab, ToolDiagram } from "@/lib/types";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ClusterDiagram } from "@/components/cluster/ClusterDiagram";
 import { RichText } from "@/components/RichText";
@@ -14,7 +14,8 @@ import {
 } from "@/lib/progress";
 
 function LabStepCard({
-  toolId,
+  id,
+  hrefBase,
   stepKey,
   title,
   command,
@@ -22,7 +23,8 @@ function LabStepCard({
   whatHappened,
   checked,
 }: {
-  toolId: string;
+  id: string;
+  hrefBase: string;
   stepKey: string;
   title: Lab["steps"][0]["title"];
   command: Lab["steps"][0]["command"];
@@ -32,13 +34,11 @@ function LabStepCard({
 }) {
   const { tr, ui } = useI18n();
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-3">
+    <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
       <div className="flex items-start gap-3">
         <button
           type="button"
-          onClick={() =>
-            toggleLabStep(stepKey, `/tools/${toolId}`, toolId)
-          }
+          onClick={() => toggleLabStep(stepKey, hrefBase, id)}
           className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-sm font-bold ${
             checked
               ? "border-teal-400/50 bg-teal-400/20 text-teal-200"
@@ -55,14 +55,14 @@ function LabStepCard({
       <CodeBlock example={command} />
       <div dir="ltr">
         <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Expected
+          {ui("expected")}
         </p>
-        <pre className="overflow-x-auto rounded-lg bg-black/40 p-3 font-mono text-[12px] text-slate-300 whitespace-pre-wrap">
+        <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg bg-black/40 p-3 font-mono text-[12px] text-slate-300">
           {expectedOutput}
         </pre>
       </div>
-      <p className="text-sm text-slate-400">
-        <span className="font-semibold text-slate-200">What happened: </span>
+      <p className="text-base text-slate-400">
+        <span className="font-semibold text-slate-200">{ui("whatHappened")} </span>
         <RichText text={whatHappened} />
       </p>
       <p className="sr-only">{ui("complete")}</p>
@@ -70,71 +70,77 @@ function LabStepCard({
   );
 }
 
-export function LabPanel({ tool }: { tool: Tool }) {
-  const { ui, lang } = useI18n();
+export function LabPanel({
+  id,
+  lab,
+  diagram,
+  hrefBase,
+}: {
+  id: string;
+  lab: Lab;
+  diagram: ToolDiagram;
+  hrefBase: string;
+}) {
+  const { ui } = useI18n();
   const [showSolution, setShowSolution] = useState(false);
   const raw = useSyncExternalStore(
     subscribeProgress,
     getProgressSnapshot,
-    () => '{"version":1,"roadmap":{},"lessons":{},"labSteps":{},"quizScores":{},"flashcards":{}}',
+    () =>
+      '{"version":1,"roadmap":{},"lessons":{},"labSteps":{},"quizScores":{},"flashcards":{}}',
   );
   const progress = useMemo(() => parseProgress(raw), [raw]);
-  const lab = tool.lab;
-
   const focusIds = lab.steps.flatMap((s) => s.diagramComponentIds ?? []);
 
   return (
     <div className="space-y-4">
-      {lang === "fa" ? (
-        <p className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-sm text-amber-100">
-          {ui("translationPending")}
-        </p>
-      ) : null}
-
       <ClusterDiagram
-        components={tool.diagram.components}
-        connections={tool.diagram.connections}
-        title="Lab focus"
+        components={diagram.components}
+        connections={diagram.connections}
+        title={ui("labFocus")}
         focusComponentIds={focusIds.length ? focusIds : null}
       />
 
       <LabStepCard
-        toolId={tool.id}
-        stepKey={`${tool.id}:${lab.kindSetup.id}`}
+        id={id}
+        hrefBase={hrefBase}
+        stepKey={`${id}:${lab.kindSetup.id}`}
         title={lab.kindSetup.title}
         command={lab.kindSetup.command}
         expectedOutput={lab.kindSetup.expectedOutput}
         whatHappened={lab.kindSetup.whatHappened}
-        checked={!!progress.labSteps[`${tool.id}:${lab.kindSetup.id}`]}
+        checked={!!progress.labSteps[`${id}:${lab.kindSetup.id}`]}
       />
 
       {lab.minikubeAlt ? (
         <LabStepCard
-          toolId={tool.id}
-          stepKey={`${tool.id}:${lab.minikubeAlt.id}`}
+          id={id}
+          hrefBase={hrefBase}
+          stepKey={`${id}:${lab.minikubeAlt.id}`}
           title={lab.minikubeAlt.title}
           command={lab.minikubeAlt.command}
           expectedOutput={lab.minikubeAlt.expectedOutput}
           whatHappened={lab.minikubeAlt.whatHappened}
-          checked={!!progress.labSteps[`${tool.id}:${lab.minikubeAlt.id}`]}
+          checked={!!progress.labSteps[`${id}:${lab.minikubeAlt.id}`]}
         />
       ) : null}
 
       {lab.steps.map((step) => (
         <LabStepCard
           key={step.id}
-          toolId={tool.id}
-          stepKey={`${tool.id}:${step.id}`}
+          id={id}
+          hrefBase={hrefBase}
+          stepKey={`${id}:${step.id}`}
           title={step.title}
           command={step.command}
           expectedOutput={step.expectedOutput}
           whatHappened={step.whatHappened}
-          checked={!!progress.labSteps[`${tool.id}:${step.id}`]}
+          checked={!!progress.labSteps[`${id}:${step.id}`]}
         />
       ))}
 
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-2">
-        <h3 className="font-semibold text-slate-50">Now try</h3>
+      <div className="space-y-2 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+        <h3 className="font-semibold text-slate-50">{ui("nowTry")}</h3>
         <p className="text-sm text-slate-300">
           <RichText text={lab.exercise.prompt} />
         </p>
@@ -149,13 +155,14 @@ export function LabPanel({ tool }: { tool: Tool }) {
       </div>
 
       <LabStepCard
-        toolId={tool.id}
-        stepKey={`${tool.id}:${lab.cleanup.id}`}
+        id={id}
+        hrefBase={hrefBase}
+        stepKey={`${id}:${lab.cleanup.id}`}
         title={lab.cleanup.title}
         command={lab.cleanup.command}
         expectedOutput={lab.cleanup.expectedOutput}
         whatHappened={lab.cleanup.whatHappened}
-        checked={!!progress.labSteps[`${tool.id}:${lab.cleanup.id}`]}
+        checked={!!progress.labSteps[`${id}:${lab.cleanup.id}`]}
       />
     </div>
   );
