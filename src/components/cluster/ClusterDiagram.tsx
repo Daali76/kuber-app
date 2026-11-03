@@ -66,7 +66,7 @@ export function ClusterDiagram({
           {title}
         </p>
       ) : null}
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#070d16]">
+      <div className="diagram-frame overflow-hidden rounded-2xl border border-white/10 bg-[#070d16] shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
         <svg
           viewBox={`0 0 ${VIEW.w} ${VIEW.h}`}
           className="h-auto w-full"
@@ -191,7 +191,8 @@ export function ClusterDiagram({
                 transform={`translate(${p.x - w / 2}, ${p.y - h / 2})`}
                 opacity={active || selected ? 1 : 0.35}
                 filter={active ? "url(#glow)" : undefined}
-                className="cursor-pointer"
+                className="cursor-pointer transition-opacity hover:opacity-100"
+                style={{ outline: "none" }}
                 onClick={() => {
                   const href = navigateOnSelect?.[c.id];
                   if (href) {
@@ -204,12 +205,14 @@ export function ClusterDiagram({
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
                     const href = navigateOnSelect?.[c.id];
                     if (href) router.push(href);
                     else setSelectedId(c.id);
                   }
                 }}
               >
+                <title>{c.label}</title>
                 <rect
                   width={w}
                   height={h}
@@ -217,6 +220,7 @@ export function ClusterDiagram({
                   fill={active ? `${accent}22` : "rgba(15,23,42,0.9)"}
                   stroke={selected ? accent : active ? `${accent}99` : "#334155"}
                   strokeWidth={selected ? 2 : 1.2}
+                  className="transition-[stroke,fill]"
                 />
                 <circle
                   cx={10}
@@ -240,7 +244,7 @@ export function ClusterDiagram({
         </svg>
       </div>
       <p className="mt-2 text-center text-[11px] text-slate-500">
-        Tap a highlighted box for object type & why it runs there
+        Select a highlighted box for object type & why it runs there
       </p>
       {selected ? (
         <ComponentInfoCard

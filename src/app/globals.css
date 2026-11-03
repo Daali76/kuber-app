@@ -26,6 +26,32 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Desktop / Mac Chrome: clearer focus + smoother hover */
+@media (hover: hover) and (pointer: fine) {
+  a:hover,
+  button:hover {
+    cursor: pointer;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid rgba(45, 212, 191, 0.7);
+  outline-offset: 2px;
+}
+
+/* Keep SVG diagrams readable (not sky-high) on wide Mac displays */
+.diagram-frame {
+  width: 100%;
+  max-width: 26rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .diagram-frame {
+    max-width: 32rem;
+  }
+}
+
 @keyframes layer-in {
   from {
     opacity: 0;

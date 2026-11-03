@@ -13,7 +13,7 @@ export function ComponentInfoCard({
 }) {
   return (
     <div
-      className="fixed inset-x-3 bottom-[4.75rem] z-[60] rounded-2xl border border-white/15 bg-[#0b1220]/95 p-4 shadow-2xl backdrop-blur-xl sm:inset-x-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2"
+      className="fixed inset-x-3 bottom-[4.75rem] z-[60] rounded-2xl border border-white/15 bg-[#0b1220]/95 p-4 shadow-2xl backdrop-blur-xl md:inset-x-auto md:bottom-8 md:left-1/2 md:w-full md:max-w-md md:-translate-x-1/2"
       role="dialog"
       aria-label={component.label}
     >

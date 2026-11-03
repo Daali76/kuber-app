@@ -71,78 +71,83 @@ export function HomeCluster() {
 
   return (
     <div className="space-y-5">
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220] p-5">
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220] p-5 md:p-8">
         <div className="brand-orb pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-teal-400/20 blur-2xl" />
-        <p className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-slate-50">
+        <p className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-slate-50 md:text-5xl">
           Cloud Native Atlas
         </p>
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-400">
-          Tap a tool to see exactly where it runs in a Kubernetes cluster — and
-          walk an implementation guide that builds the diagram step by step.
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400 md:text-base">
+          Select a tool to see exactly where it runs in a Kubernetes cluster —
+          then walk an implementation guide that builds the diagram step by
+          step.
         </p>
-        <div className="hero-rule mt-4 rounded-full" />
+        <div className="hero-rule mt-4 max-w-md rounded-full" />
       </div>
 
-      <ClusterDiagram
-        components={model.components}
-        connections={model.connections}
-        accent="#38bdf8"
-        title="Cluster overview — tap a tool pin"
-        navigateOnSelect={Object.fromEntries(
-          Object.entries(model.pinToTool).map(([pin, id]) => [
-            pin,
-            `/tools/${id}`,
-          ]),
-        )}
-      />
-
-      <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-          Tools by layer
-        </p>
-        <div className="mb-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <FilterChip
-            label="All"
-            active={filter === "all"}
-            onClick={() => setFilter("all")}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,32rem)_minmax(0,1fr)] lg:items-start lg:gap-10">
+        <div className="lg:sticky lg:top-20">
+          <ClusterDiagram
+            components={model.components}
+            connections={model.connections}
+            accent="#38bdf8"
+            title="Cluster overview — select a tool pin"
+            navigateOnSelect={Object.fromEntries(
+              Object.entries(model.pinToTool).map(([pin, id]) => [
+                pin,
+                `/tools/${id}`,
+              ]),
+            )}
           />
-          {layers.map((l) => (
-            <FilterChip
-              key={l.id}
-              label={l.shortName}
-              active={filter === l.id}
-              onClick={() => setFilter(l.id)}
-              accent={l.accent}
-            />
-          ))}
         </div>
 
-        <ul className="space-y-2">
-          {visibleTools.map((tool) => {
-            const layer = getLayer(tool.layer)!;
-            return (
-              <li key={tool.id}>
-                <Link
-                  href={`/tools/${tool.id}`}
-                  className="flex min-h-16 items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 transition active:bg-white/[0.06]"
-                >
-                  <span
-                    className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ background: layer.accent }}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="font-[family-name:var(--font-display)] font-semibold text-slate-50">
-                      {tool.name}
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+            Tools by layer
+          </p>
+          <div className="mb-3 flex flex-wrap gap-2">
+            <FilterChip
+              label="All"
+              active={filter === "all"}
+              onClick={() => setFilter("all")}
+            />
+            {layers.map((l) => (
+              <FilterChip
+                key={l.id}
+                label={l.shortName}
+                active={filter === l.id}
+                onClick={() => setFilter(l.id)}
+                accent={l.accent}
+              />
+            ))}
+          </div>
+
+          <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-2">
+            {visibleTools.map((tool) => {
+              const layer = getLayer(tool.layer)!;
+              return (
+                <li key={tool.id}>
+                  <Link
+                    href={`/tools/${tool.id}`}
+                    className="flex min-h-16 items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 transition hover:border-white/20 hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400"
+                  >
+                    <span
+                      className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ background: layer.accent }}
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="font-[family-name:var(--font-display)] font-semibold text-slate-50">
+                        {tool.name}
+                      </span>
+                      <span className="mt-0.5 block text-sm text-slate-400">
+                        {tool.placementBlurb}
+                      </span>
                     </span>
-                    <span className="mt-0.5 block text-sm text-slate-400">
-                      {tool.placementBlurb}
-                    </span>
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     </div>
   );
@@ -163,7 +168,7 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`min-h-10 shrink-0 rounded-lg border px-3 text-sm font-medium ${
+      className={`min-h-10 shrink-0 rounded-lg border px-3 text-sm font-medium transition hover:border-white/20 ${
         active
           ? "border-teal-400/40 bg-teal-400/15 text-teal-100"
           : "border-white/10 bg-black/20 text-slate-300"

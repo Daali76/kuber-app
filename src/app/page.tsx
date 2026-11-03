@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <AppShell
       title="Cluster map"
-      subtitle={`${toolCount} tools — tap a pin or card to open its placement diagram and install guide.`}
+      subtitle={`${toolCount} tools — select a pin or card to open its placement diagram and install guide.`}
     >
       <HomeCluster />
     </AppShell>

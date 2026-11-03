@@ -1,4 +1,4 @@
-import { BottomNav } from "@/components/BottomNav";
+import { AppNav } from "@/components/AppNav";
 
 export function AppShell({
   children,
@@ -25,29 +25,29 @@ export function AppShell({
         />
       </div>
 
-      <header className="relative z-10 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))]">
-        <div className="mx-auto max-w-2xl">
-          <p className="font-[family-name:var(--font-display)] text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-300/90">
+      <AppNav />
+
+      <header className="relative z-10 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))] md:px-6 md:pt-8">
+        <div className="mx-auto max-w-6xl">
+          <p className="font-[family-name:var(--font-display)] text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-300/90 md:hidden">
             Cloud Native Atlas
           </p>
           {title ? (
-            <h1 className="mt-1 font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-slate-50 sm:text-3xl">
+            <h1 className="mt-1 font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-slate-50 sm:text-3xl md:mt-0 md:text-4xl">
               {title}
             </h1>
           ) : null}
           {subtitle ? (
-            <p className="mt-1 max-w-prose text-sm leading-relaxed text-slate-400">
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-400 md:text-base">
               {subtitle}
             </p>
           ) : null}
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto w-full max-w-2xl flex-1 px-4 pb-28 pt-2">
+      <main className="relative z-10 mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-2 md:px-6 md:pb-12 md:pt-4">
         {children}
       </main>
-
-      <BottomNav />
     </div>
   );
 }

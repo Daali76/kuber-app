@@ -27,13 +27,13 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
     <div>
       <Link
         href="/"
-        className="mb-3 inline-flex min-h-10 items-center text-sm text-slate-400"
+        className="mb-3 inline-flex min-h-10 items-center text-sm text-slate-400 transition hover:text-teal-200"
       >
         ← Cluster map
       </Link>
 
       <header
-        className="mb-4 overflow-hidden rounded-2xl border border-white/10 p-4"
+        className="mb-4 overflow-hidden rounded-2xl border border-white/10 p-4 md:p-6"
         style={{
           background: `linear-gradient(160deg, ${layer.accentSoft}, rgba(8,12,20,0.95))`,
         }}
@@ -47,20 +47,24 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
             {layer.shortName}
           </span>
         </div>
-        <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-slate-50">
+        <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-slate-50 md:text-4xl">
           {tool.name}
         </h1>
-        <p className="mt-1 text-sm text-slate-300">{tool.summary}</p>
-        <p className="mt-2 text-xs text-slate-400">{tool.placementBlurb}</p>
+        <p className="mt-1 max-w-3xl text-sm text-slate-300 md:text-base">
+          {tool.summary}
+        </p>
+        <p className="mt-2 text-xs text-slate-400 md:text-sm">
+          {tool.placementBlurb}
+        </p>
       </header>
 
-      <div className="mb-4 flex gap-1 rounded-xl bg-black/30 p-1">
+      <div className="mb-4 flex gap-1 rounded-xl bg-black/30 p-1 md:max-w-xl">
         {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`min-h-11 flex-1 rounded-lg px-1 text-xs font-semibold sm:text-sm ${
+            className={`min-h-11 flex-1 rounded-lg px-1 text-xs font-semibold transition hover:text-slate-200 sm:text-sm ${
               tab === t.id
                 ? "bg-teal-400/20 text-teal-100"
                 : "text-slate-400"
