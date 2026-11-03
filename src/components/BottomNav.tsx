@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 const items = [
   { href: "/", label: "Map", icon: MapIcon },
   { href: "/roadmap", label: "Roadmap", icon: RoadIcon },
-  { href: "/builder", label: "Builder", icon: BuildIcon },
   { href: "/search", label: "Search", icon: SearchIcon },
 ] as const;
 
@@ -78,40 +77,6 @@ function RoadIcon({ active }: { active: boolean }) {
         stroke={active ? "#5eead4" : "currentColor"}
         strokeWidth="1.6"
         strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function BuildIcon({ active }: { active: boolean }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect
-        x="4"
-        y="14"
-        width="16"
-        height="4"
-        rx="1"
-        stroke={active ? "#5eead4" : "currentColor"}
-        strokeWidth="1.6"
-      />
-      <rect
-        x="6"
-        y="9"
-        width="12"
-        height="4"
-        rx="1"
-        stroke={active ? "#5eead4" : "currentColor"}
-        strokeWidth="1.6"
-      />
-      <rect
-        x="8"
-        y="4"
-        width="8"
-        height="4"
-        rx="1"
-        stroke={active ? "#5eead4" : "currentColor"}
-        strokeWidth="1.6"
       />
     </svg>
   );

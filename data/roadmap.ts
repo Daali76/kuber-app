@@ -4,50 +4,49 @@ export const roadmapSteps: RoadmapStep[] = [
   {
     id: "containers",
     title: "Containers & runtime",
-    description:
-      "Learn images, containers, and how CRI runtimes execute pods on a node.",
-    toolIds: ["containerd", "cri-o"],
+    description: "How images become running containers on a node.",
+    toolIds: ["containerd"],
   },
   {
     id: "kubernetes-basics",
     title: "Kubernetes basics",
-    description:
-      "Pods, Deployments, Services, and the control plane that schedules them.",
-    toolIds: ["kubernetes", "etcd", "coredns"],
+    description: "Control plane, kubelet, Pods, and Services.",
+    toolIds: ["kubernetes", "coredns"],
   },
   {
     id: "helm",
     title: "Package with Helm",
-    description:
-      "Templated charts for repeatable installs and upgrades of Kubernetes apps.",
+    description: "Charts and releases against the API server.",
     toolIds: ["helm"],
   },
   {
     id: "gitops",
     title: "GitOps delivery",
-    description:
-      "Declare desired state in Git and reconcile clusters continuously.",
-    toolIds: ["argo-cd", "flux"],
+    description: "Declare desired state in Git and reconcile continuously.",
+    toolIds: ["argo-cd"],
   },
   {
     id: "observability",
     title: "Observability",
-    description:
-      "Collect metrics, traces, and logs so you can debug production systems.",
-    toolIds: ["prometheus", "opentelemetry", "jaeger", "fluentd"],
+    description: "Metrics, dashboards, traces, and logs.",
+    toolIds: ["prometheus", "grafana", "opentelemetry", "fluent-bit"],
   },
   {
     id: "service-mesh",
-    title: "Service mesh & networking",
-    description:
-      "Secure service-to-service traffic, observability, and advanced routing.",
-    toolIds: ["cilium", "istio", "linkerd", "envoy"],
+    title: "Networking & mesh",
+    description: "CNI policy and service mesh traffic control.",
+    toolIds: ["cilium", "istio"],
   },
   {
     id: "security",
     title: "Security & policy",
-    description:
-      "Admission policy, runtime detection, certificates, and workload identity.",
-    toolIds: ["opa", "kyverno", "falco", "cert-manager", "spiffe", "spire"],
+    description: "Admission policy, runtime detection, and certificates.",
+    toolIds: ["kyverno", "falco", "cert-manager"],
+  },
+  {
+    id: "storage",
+    title: "Storage",
+    description: "Software-defined storage with Rook/Ceph.",
+    toolIds: ["rook"],
   },
 ];

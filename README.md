@@ -50,12 +50,12 @@ npx vercel
 
 ## Features
 
-1. **Map** — eight layers (infra → security) with tappable tool chips
-2. **Tool detail** — maturity, explain levels, connections, examples, docs/GitHub
-3. **Roadmap** — beginner → expert steps with localStorage progress
-4. **Builder** — guided recommendations (one tool per layer + install order)
-5. **Search** — filter by layer and CNCF maturity
+1. **Cluster map (home)** — tools placed on a Kubernetes cluster diagram; tap to open a tool
+2. **Placement diagram** — interactive SVG of where the tool runs, with flow arrows
+3. **Implement guide** — prerequisites → install → verify → example → test → mistakes; diagram builds up per step
+4. **Explain / Alternatives** — levels plus comparisons
+5. **Roadmap & Search** — learning path and filters
 
 ## Extend the catalog
 
-Add a typed object to `data/tools.ts` (`Tool` in `src/lib/types.ts`). Wire layer metadata in `data/layers.ts` and roadmap links in `data/roadmap.ts`.
+Add `data/tools/<id>.ts` exporting a `Tool` (see `src/lib/types.ts`) with `diagram` + `implement`, then register it in `data/tools/index.ts`.

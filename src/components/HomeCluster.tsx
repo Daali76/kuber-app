@@ -1,0 +1,184 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { getLayer, layers } from "@data/layers";
+import { tools } from "@data/tools";
+import type { DiagramZone, Tool } from "@/lib/types";
+import { clusterBase } from "@data/tools/_base";
+import { ClusterDiagram } from "@/components/cluster/ClusterDiagram";
+
+/** Map tools onto overview diagram components as extra pins. */
+function overviewModel() {
+  const base = clusterBase();
+  const pins = tools.map((tool) => {
+    const zone = pinZone(tool);
+    return {
+      id: `tool-${tool.id}`,
+      label: tool.name,
+      zone,
+      objectType: "External" as const,
+      description: tool.summary,
+      whyThere: tool.placementBlurb,
+      highlight: true,
+      toolId: tool.id,
+      slot: tool.id,
+    };
+  });
+
+  // Replace generic highlights — keep skeleton dim, tools hot
+  const components = [
+    ...base.components.map((c) => ({ ...c, highlight: false })),
+    ...pins,
+  ];
+
+  return {
+    components,
+    connections: base.connections.map((c) => ({ ...c, highlight: false })),
+    pinToTool: Object.fromEntries(pins.map((p) => [p.id, p.toolId])),
+  };
+}
+
+function pinZone(tool: Tool): DiagramZone {
+  switch (tool.layer) {
+    case "runtime":
+      return "worker-node";
+    case "orchestration":
+      return tool.id === "kubernetes" ? "control-plane" : "namespace";
+    case "networking":
+      if (tool.id === "coredns") return "namespace";
+      if (tool.id === "cilium") return "worker-node";
+      return "namespace";
+    case "storage":
+      return "worker-node";
+    case "delivery":
+      return tool.id === "helm" ? "external" : "namespace";
+    case "observability":
+      return tool.id === "fluent-bit" ? "worker-node" : "namespace";
+    case "security":
+      return tool.id === "falco" ? "worker-node" : "namespace";
+    default:
+      return "external";
+  }
+}
+
+export function HomeCluster() {
+  const model = useMemo(() => overviewModel(), []);
+  const [filter, setFilter] = useState<string>("all");
+
+  const visibleTools =
+    filter === "all" ? tools : tools.filter((t) => t.layer === filter);
+
+  return (
+    <div className="space-y-5">
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220] p-5">
+        <div className="brand-orb pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-teal-400/20 blur-2xl" />
+        <p className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-slate-50">
+          Cloud Native Atlas
+        </p>
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-400">
+          Tap a tool to see exactly where it runs in a Kubernetes cluster — and
+          walk an implementation guide that builds the diagram step by step.
+        </p>
+        <div className="hero-rule mt-4 rounded-full" />
+      </div>
+
+      <ClusterDiagram
+        components={model.components}
+        connections={model.connections}
+        accent="#38bdf8"
+        title="Cluster overview — tap a tool pin"
+        navigateOnSelect={Object.fromEntries(
+          Object.entries(model.pinToTool).map(([pin, id]) => [
+            pin,
+            `/tools/${id}`,
+          ]),
+        )}
+      />
+
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+          Tools by layer
+        </p>
+        <div className="mb-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <FilterChip
+            label="All"
+            active={filter === "all"}
+            onClick={() => setFilter("all")}
+          />
+          {layers.map((l) => (
+            <FilterChip
+              key={l.id}
+              label={l.shortName}
+              active={filter === l.id}
+              onClick={() => setFilter(l.id)}
+              accent={l.accent}
+            />
+          ))}
+        </div>
+
+        <ul className="space-y-2">
+          {visibleTools.map((tool) => {
+            const layer = getLayer(tool.layer)!;
+            return (
+              <li key={tool.id}>
+                <Link
+                  href={`/tools/${tool.id}`}
+                  className="flex min-h-16 items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 transition active:bg-white/[0.06]"
+                >
+                  <span
+                    className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ background: layer.accent }}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="font-[family-name:var(--font-display)] font-semibold text-slate-50">
+                      {tool.name}
+                    </span>
+                    <span className="mt-0.5 block text-sm text-slate-400">
+                      {tool.placementBlurb}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function FilterChip({
+  label,
+  active,
+  onClick,
+  accent,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  accent?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`min-h-10 shrink-0 rounded-lg border px-3 text-sm font-medium ${
+        active
+          ? "border-teal-400/40 bg-teal-400/15 text-teal-100"
+          : "border-white/10 bg-black/20 text-slate-300"
+      }`}
+      style={
+        active && accent
+          ? {
+              borderColor: `${accent}66`,
+              background: `${accent}22`,
+              color: "#ecfeff",
+            }
+          : undefined
+      }
+    >
+      {label}
+    </button>
+  );
+}

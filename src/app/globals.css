@@ -80,3 +80,13 @@ body {
   background-size: 200% 100%;
   animation: shimmer-line 8s linear infinite;
 }
+
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -56;
+  }
+}
+
+.flow-dash {
+  animation: flow-dash 1.2s linear infinite;
+}

@@ -38,55 +38,40 @@ export function recommendStack(input: BuilderInput): StackPick[] {
   const isLarge = scale === "large";
   const onPrem = environment === "on-prem" || environment === "hybrid";
 
-  const picks: Record<LayerId, { id: string; reason: string }> = {
-    infrastructure: {
-      id: onPrem || wantsSimple ? "crossplane" : "terraform",
-      reason: onPrem
-        ? "Kubernetes-native infra APIs fit hybrid/on-prem platforms."
-        : wantsSimple
-          ? "Crossplane keeps infra in the same GitOps control plane as apps."
-          : "Terraform remains the broadest multi-cloud provisioning choice.",
-    },
+  const picks: Partial<Record<LayerId, { id: string; reason: string }>> = {
     runtime: {
       id: "containerd",
-      reason: "Default, widely supported CRI runtime across distributions.",
+      reason: "Default CRI runtime on most Kubernetes distributions.",
     },
     orchestration: {
-      id: isLarge && !wantsSimple ? "keda" : "kubernetes",
-      reason:
-        isLarge && !wantsSimple
-          ? "Pair Kubernetes with KEDA when event-driven scale matters at size."
-          : "Kubernetes is the orchestration baseline for this atlas.",
+      id: "kubernetes",
+      reason: "Orchestration baseline for every other tool in this atlas.",
     },
     networking: {
-      id: wantsSimple ? "linkerd" : wantsSecurity ? "cilium" : isLarge ? "istio" : "cilium",
+      id: wantsSimple ? "coredns" : wantsSecurity || isLarge ? "cilium" : "istio",
       reason: wantsSimple
-        ? "Linkerd keeps mesh operations light for smaller teams."
-        : wantsSecurity
-          ? "Cilium adds eBPF identity-aware networking and policy."
-          : isLarge
-            ? "Istio covers advanced L7 traffic features at scale."
-            : "Cilium is a strong modern CNI with observability built in.",
+        ? "Start with CoreDNS before adding a mesh or advanced CNI."
+        : wantsSecurity || isLarge
+          ? "Cilium gives eBPF networking and identity-aware policy."
+          : "Istio covers advanced L7 mesh features.",
     },
     storage: {
-      id: onPrem ? (wantsSimple ? "longhorn" : "rook") : "etcd",
+      id: onPrem ? "rook" : "kubernetes",
       reason: onPrem
-        ? wantsSimple
-          ? "Longhorn provides simpler distributed block storage on-prem."
-          : "Rook/Ceph covers block, file, and object for serious on-prem needs."
-        : "Protect etcd first — it holds Kubernetes control-plane state.",
+        ? "Rook/Ceph fits self-managed on-prem persistent storage."
+        : "Prefer cloud disks first; keep etcd/control-plane healthy via Kubernetes ops.",
     },
     delivery: {
-      id: wantsSimple ? "flux" : "argo-cd",
+      id: wantsSimple ? "helm" : "argo-cd",
       reason: wantsSimple
-        ? "Flux's modular controllers are lightweight for GitOps."
-        : "Argo CD's app model and UI help larger teams manage many deployments.",
+        ? "Helm is the lightest packaging path."
+        : "Argo CD continuously reconciles Git to the cluster.",
     },
     observability: {
-      id: wantsObs || isLarge ? "opentelemetry" : "prometheus",
-      reason: wantsObs || isLarge
-        ? "OpenTelemetry keeps instrumentation portable as the stack grows."
-        : "Prometheus is the practical metrics starting point on Kubernetes.",
+      id: wantsObs ? "opentelemetry" : "prometheus",
+      reason: wantsObs
+        ? "OpenTelemetry keeps instrumentation portable."
+        : "Prometheus is the practical metrics starting point.",
     },
     security: {
       id: wantsSecurity
@@ -96,32 +81,23 @@ export function recommendStack(input: BuilderInput): StackPick[] {
         : "cert-manager",
       reason: wantsSecurity
         ? wantsSimple
-          ? "Kyverno expresses Kubernetes policy in familiar YAML."
-          : "Falco adds runtime detection once baseline controls exist."
-        : "cert-manager automates TLS — a universal security baseline.",
+          ? "Kyverno expresses admission policy in YAML."
+          : "Falco adds runtime detection on every node."
+        : "cert-manager automates TLS certificates.",
     },
   };
 
-  // Ensure orchestration always includes kubernetes when KEDA picked
-  return layersBottomToTop.map((layer) => {
-    let pick = picks[layer.id];
-    if (layer.id === "orchestration" && pick.id === "keda") {
-      // Recommend KEDA but diagram should still center Kubernetes — use kubernetes as primary
-      pick = {
-        id: "kubernetes",
-        reason:
-          "Start with Kubernetes; add KEDA next for event-driven autoscaling at scale.",
-      };
-    }
-    const tool = prefer([pick.id])!;
-    return { layer: layer.id, tool, reason: pick.reason };
-  });
+  return layersBottomToTop
+    .filter((layer) => picks[layer.id])
+    .map((layer) => {
+      const pick = picks[layer.id]!;
+      const tool = prefer([pick.id])!;
+      return { layer: layer.id, tool, reason: pick.reason };
+    });
 }
 
 export function installationOrder(stack: StackPick[]): StackPick[] {
-  // Bottom-up install: infra → runtime → orchestration → networking → storage → security baseline → delivery → observability
   const order: LayerId[] = [
-    "infrastructure",
     "runtime",
     "orchestration",
     "networking",

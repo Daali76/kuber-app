@@ -1,4 +1,4 @@
-import type { Tool } from "@/lib/types";
+import type { CodeSnippet } from "@/lib/types";
 
 const KEYWORDS = new Set([
   "apiVersion",
@@ -109,7 +109,7 @@ function highlightLine(line: string, language: string): React.ReactNode[] {
   return nodes;
 }
 
-export function CodeBlock({ example }: { example: Tool["example"] }) {
+export function CodeBlock({ example }: { example: CodeSnippet }) {
   const lines = example.code.replace(/\n$/, "").split("\n");
   return (
     <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0a1018]">
@@ -121,7 +121,7 @@ export function CodeBlock({ example }: { example: Tool["example"] }) {
       </div>
       <pre className="overflow-x-auto p-3 text-[12.5px] leading-relaxed">
         <code className="font-[family-name:var(--font-mono)]">
-          {lines.map((line, idx) => (
+          {lines.map((line: string, idx: number) => (
             <div key={idx} className="whitespace-pre">
               <span className="mr-3 inline-block w-5 select-none text-right text-slate-600">
                 {idx + 1}
