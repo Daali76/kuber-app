@@ -26,6 +26,14 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+html.lang-fa body {
+  font-family: var(--font-fa), var(--font-body), ui-sans-serif, sans-serif;
+}
+
+html.lang-fa .font-\[family-name\:var\(--font-display\)\] {
+  font-family: var(--font-fa), var(--font-display), sans-serif;
+}
+
 /* Desktop / Mac Chrome: clearer focus + smoother hover */
 @media (hover: hover) and (pointer: fine) {
   a:hover,
@@ -39,16 +47,16 @@ body {
   outline-offset: 2px;
 }
 
-/* Keep SVG diagrams readable (not sky-high) on wide Mac displays */
+/* Keep SVG diagrams readable on wide Mac / Chrome displays */
 .diagram-frame {
   width: 100%;
-  max-width: 26rem;
+  max-width: 24rem;
   margin-inline: auto;
 }
 
 @media (min-width: 768px) {
   .diagram-frame {
-    max-width: 32rem;
+    max-width: 28rem;
   }
 }
 

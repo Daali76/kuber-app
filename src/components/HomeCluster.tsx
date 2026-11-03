@@ -1,12 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { getLayer, layers } from "@data/layers";
 import { tools } from "@data/tools";
 import type { DiagramZone, Tool } from "@/lib/types";
 import { clusterBase } from "@data/tools/_base";
 import { ClusterDiagram } from "@/components/cluster/ClusterDiagram";
+import { useI18n } from "@/lib/i18n";
+import {
+  getProgressSnapshot,
+  parseProgress,
+  subscribeProgress,
+} from "@/lib/progress";
 
 /** Map tools onto overview diagram components as extra pins. */
 function overviewModel() {
@@ -63,8 +69,15 @@ function pinZone(tool: Tool): DiagramZone {
 }
 
 export function HomeCluster() {
+  const { ui } = useI18n();
   const model = useMemo(() => overviewModel(), []);
   const [filter, setFilter] = useState<string>("all");
+  const raw = useSyncExternalStore(
+    subscribeProgress,
+    getProgressSnapshot,
+    () => '{"version":1,"roadmap":{},"lessons":{},"labSteps":{},"quizScores":{},"flashcards":{}}',
+  );
+  const progress = useMemo(() => parseProgress(raw), [raw]);
 
   const visibleTools =
     filter === "all" ? tools : tools.filter((t) => t.layer === filter);
@@ -72,9 +85,9 @@ export function HomeCluster() {
   return (
     <div className="space-y-5">
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220] p-5 md:p-8">
-        <div className="brand-orb pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-teal-400/20 blur-2xl" />
+        <div className="brand-orb pointer-events-none absolute -end-8 -top-10 h-36 w-36 rounded-full bg-teal-400/20 blur-2xl" />
         <p className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-slate-50 md:text-5xl">
-          Cloud Native Atlas
+          {ui("brand")}
         </p>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400 md:text-base">
           Select a tool to see exactly where it runs in a Kubernetes cluster —
@@ -83,6 +96,36 @@ export function HomeCluster() {
         </p>
         <div className="hero-rule mt-4 max-w-md rounded-full" />
       </div>
+
+      {progress.continue ? (
+        <Link
+          href={progress.continue.href}
+          className="flex min-h-14 items-center justify-between rounded-xl border border-teal-400/30 bg-teal-400/10 px-4 py-3"
+        >
+          <span>
+            <span className="block text-xs font-semibold uppercase tracking-wider text-teal-300/80">
+              {ui("continueTitle")}
+            </span>
+            <span className="text-sm text-slate-100">
+              {progress.continue.href}
+            </span>
+          </span>
+          <span className="text-teal-200">→</span>
+        </Link>
+      ) : (
+        <Link
+          href="/learn"
+          className="flex min-h-14 items-center justify-between rounded-xl border border-teal-400/30 bg-teal-400/10 px-4 py-3"
+        >
+          <span>
+            <span className="block text-xs font-semibold uppercase tracking-wider text-teal-300/80">
+              {ui("continueTitle")}
+            </span>
+            <span className="text-sm text-slate-100">{ui("learnHubTitle")}</span>
+          </span>
+          <span className="text-teal-200">→</span>
+        </Link>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,32rem)_minmax(0,1fr)] lg:items-start lg:gap-10">
         <div className="lg:sticky lg:top-20">

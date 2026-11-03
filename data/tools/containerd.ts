@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -7,7 +6,7 @@ const base = clusterBase({
   highlightAppPod: true,
 });
 
-export const containerd: Tool = {
+export const containerd = {
   id: "containerd",
   name: "containerd",
   layer: "runtime",
@@ -100,12 +99,15 @@ export const containerd: Tool = {
       id: "install",
       title: "Install",
       description:
-        "Install containerd from your distro or the official packages, then enable the service.",
+        "Write the default config first (with SystemdCgroup for kubelet), then enable and restart the service.",
       code: {
         language: "bash",
-        title: "systemd",
-        code: `sudo systemctl enable --now containerd
+        title: "config then systemd",
+        code: `sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml
+# Kubernetes expects the runc runtime to use systemd cgroups (not cgroupfs).
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+sudo systemctl enable --now containerd
 sudo systemctl restart containerd`,
       },
       diagramComponentIds: ["runtime", "kubelet"],
@@ -155,11 +157,12 @@ sudo crictl ps`,
       id: "mistakes",
       title: "Common mistakes",
       description:
-        "kubelet pointed at the wrong socket; CRI plugin disabled in config.toml; sandbox image not pullable (pause image).",
+        "Leaving SystemdCgroup = false (pods fail cgroup setup with systemd kubelet); kubelet pointed at the wrong socket; CRI plugin disabled in config.toml; sandbox image not pullable (pause image).",
       code: {
         language: "bash",
-        title: "Check kubelet flags",
-        code: `ps aux | grep kubelet | tr ' ' '\\n' | grep container-runtime`,
+        title: "Check cgroup + kubelet",
+        code: `grep SystemdCgroup /etc/containerd/config.toml
+ps aux | grep kubelet | tr ' ' '\\n' | grep container-runtime`,
       },
       diagramComponentIds: ["runtime", "kubelet"],
     },

@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -7,7 +6,7 @@ const base = clusterBase({
   highlightSvc: true,
 });
 
-export const certManager: Tool = {
+export const certManager = {
   id: "cert-manager",
   name: "cert-manager",
   layer: "security",

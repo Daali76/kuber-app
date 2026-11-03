@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -6,7 +5,7 @@ const base = clusterBase({
   highlightAppPod: true,
 });
 
-export const rook: Tool = {
+export const rook = {
   id: "rook",
   name: "Rook",
   layer: "storage",
@@ -145,9 +144,9 @@ export const rook: Tool = {
       code: {
         language: "bash",
         title: "Operator manifests",
-        code: `kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.15.3/deploy/examples/crds.yaml
-kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.15.3/deploy/examples/common.yaml
-kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.15.3/deploy/examples/operator.yaml`,
+        code: `kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.21.1/deploy/examples/crds.yaml
+kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.21.1/deploy/examples/common.yaml
+kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.21.1/deploy/examples/operator.yaml`,
       },
       diagramComponentIds: ["rook-operator"],
       diagramConnectionIds: ["operator-api"],
@@ -172,7 +171,7 @@ kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.15.3/deploy/exa
       code: {
         language: "bash",
         title: "CephCluster",
-        code: `kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.15.3/deploy/examples/cluster.yaml
+        code: `kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.21.1/deploy/examples/cluster.yaml
 kubectl -n rook-ceph get cephcluster`,
       },
       diagramComponentIds: [
@@ -229,9 +228,9 @@ spec:
       code: {
         language: "bash",
         title: "Ceph status",
-        code: `kubectl -n rook-ceph get pods -l app=rook-ceph-tools
-# once tools pod exists:
-# kubectl -n rook-ceph exec -it deploy/rook-ceph-tools -- ceph status`,
+        code: `kubectl create -f https://raw.githubusercontent.com/rook/rook/v1.21.1/deploy/examples/toolbox.yaml
+kubectl -n rook-ceph rollout status deploy/rook-ceph-tools
+kubectl -n rook-ceph exec -it deploy/rook-ceph-tools -- ceph status`,
       },
       diagramComponentIds: ["rook-operator", "ceph-mons", "ceph-osds"],
     },

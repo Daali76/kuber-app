@@ -1,4 +1,8 @@
+"use client";
+
 import { AppNav } from "@/components/AppNav";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useI18n } from "@/lib/i18n";
 
 export function AppShell({
   children,
@@ -9,12 +13,13 @@ export function AppShell({
   title?: string;
   subtitle?: string;
 }) {
+  const { ui } = useI18n();
   return (
     <div className="relative flex min-h-full flex-1 flex-col">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-24 top-0 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
-        <div className="absolute -right-16 top-40 h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
-        <div className="absolute bottom-24 left-1/3 h-56 w-56 rounded-full bg-orange-500/5 blur-3xl" />
+        <div className="absolute -start-24 top-0 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
+        <div className="absolute -end-16 top-40 h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
+        <div className="absolute bottom-24 start-1/3 h-56 w-56 rounded-full bg-orange-500/5 blur-3xl" />
         <div
           className="absolute inset-0 opacity-[0.35]"
           style={{
@@ -28,20 +33,25 @@ export function AppShell({
       <AppNav />
 
       <header className="relative z-10 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))] md:px-6 md:pt-8">
-        <div className="mx-auto max-w-6xl">
-          <p className="font-[family-name:var(--font-display)] text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-300/90 md:hidden">
-            Cloud Native Atlas
-          </p>
-          {title ? (
-            <h1 className="mt-1 font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-slate-50 sm:text-3xl md:mt-0 md:text-4xl">
-              {title}
-            </h1>
-          ) : null}
-          {subtitle ? (
-            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-400 md:text-base">
-              {subtitle}
+        <div className="mx-auto flex max-w-6xl items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-[family-name:var(--font-display)] text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-300/90 md:hidden">
+              {ui("brand")}
             </p>
-          ) : null}
+            {title ? (
+              <h1 className="mt-1 font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-slate-50 sm:text-3xl md:mt-0 md:text-4xl">
+                {title}
+              </h1>
+            ) : null}
+            {subtitle ? (
+              <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-400 md:text-base">
+                {subtitle}
+              </p>
+            ) : null}
+          </div>
+          <div className="shrink-0 md:hidden">
+            <LanguageToggle compact />
+          </div>
         </div>
       </header>
 

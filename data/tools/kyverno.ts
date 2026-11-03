@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -6,7 +5,7 @@ const base = clusterBase({
   highlightAppPod: true,
 });
 
-export const kyverno: Tool = {
+export const kyverno = {
   id: "kyverno",
   name: "Kyverno",
   layer: "security",

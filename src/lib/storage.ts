@@ -1,16 +1,29 @@
-const ROADMAP_KEY = "cna-roadmap-progress";
+/** @deprecated prefer src/lib/progress — kept as thin roadmap adapters */
+import {
+  getProgressSnapshot,
+  loadProgress,
+  saveProgress,
+  subscribeProgress,
+} from "@/lib/progress";
+
+export const ROADMAP_CHANGE_EVENT = "cna-progress-change";
 
 export function loadRoadmapProgress(): Record<string, boolean> {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = window.localStorage.getItem(ROADMAP_KEY);
-    return raw ? (JSON.parse(raw) as Record<string, boolean>) : {};
-  } catch {
-    return {};
-  }
+  return loadProgress().roadmap;
+}
+
+export function getRoadmapProgressSnapshot(): string {
+  return JSON.stringify(loadProgress().roadmap);
 }
 
 export function saveRoadmapProgress(progress: Record<string, boolean>) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(ROADMAP_KEY, JSON.stringify(progress));
+  const p = loadProgress();
+  p.roadmap = progress;
+  saveProgress(p);
 }
+
+export function subscribeRoadmapProgress(onStoreChange: () => void) {
+  return subscribeProgress(onStoreChange);
+}
+
+export { getProgressSnapshot, subscribeProgress };

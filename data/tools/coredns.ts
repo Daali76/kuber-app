@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -7,7 +6,7 @@ const base = clusterBase({
   highlightSvc: true,
 });
 
-export const coredns: Tool = {
+export const coredns = {
   id: "coredns",
   name: "CoreDNS",
   layer: "networking",

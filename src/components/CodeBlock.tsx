@@ -112,7 +112,10 @@ function highlightLine(line: string, language: string): React.ReactNode[] {
 export function CodeBlock({ example }: { example: CodeSnippet }) {
   const lines = example.code.replace(/\n$/, "").split("\n");
   return (
-    <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0a1018]">
+    <div
+      className="overflow-hidden rounded-xl border border-white/10 bg-[#0a1018]"
+      dir="ltr"
+    >
       <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
         <span className="text-xs font-medium text-slate-400">{example.title}</span>
         <span className="rounded bg-white/5 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-slate-500">
@@ -123,7 +126,7 @@ export function CodeBlock({ example }: { example: CodeSnippet }) {
         <code className="font-[family-name:var(--font-mono)]">
           {lines.map((line: string, idx: number) => (
             <div key={idx} className="whitespace-pre">
-              <span className="mr-3 inline-block w-5 select-none text-right text-slate-600">
+              <span className="me-3 inline-block w-5 select-none text-end text-slate-600">
                 {idx + 1}
               </span>
               {highlightLine(line, example.language)}

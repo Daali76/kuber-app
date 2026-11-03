@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -6,7 +5,7 @@ const base = clusterBase({
   highlightKubelet: true,
 });
 
-export const fluentBit: Tool = {
+export const fluentBit = {
   id: "fluent-bit",
   name: "Fluent Bit",
   layer: "observability",

@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -6,7 +5,7 @@ const base = clusterBase({
   highlightAppPod: true,
 });
 
-export const helm: Tool = {
+export const helm = {
   id: "helm",
   name: "Helm",
   layer: "delivery",
@@ -137,13 +136,14 @@ kubectl auth can-i create deployments`,
     {
       id: "example",
       title: "Minimal working example",
-      description: "Install the bitnami/nginx chart with a ClusterIP Service.",
+      description: "Install the maintained podinfo chart (demo app) from Stefan Prodan's chart repo.",
       code: {
         language: "bash",
         title: "helm install",
-        code: `helm repo add bitnami https://charts.bitnami.com/bitnami
+        code: `helm repo add podinfo https://stefanprodan.github.io/podinfo
 helm repo update
-helm install my-nginx bitnami/nginx --set service.type=ClusterIP`,
+helm install my-podinfo podinfo/podinfo \\
+  --set service.type=ClusterIP`,
       },
       diagramComponentIds: [
         "helm-cli",
@@ -160,8 +160,8 @@ helm install my-nginx bitnami/nginx --set service.type=ClusterIP`,
       code: {
         language: "bash",
         title: "Status",
-        code: `helm status my-nginx
-kubectl get deploy,svc -l app.kubernetes.io/instance=my-nginx`,
+        code: `helm status my-podinfo
+kubectl get deploy,svc -l app.kubernetes.io/instance=my-podinfo`,
       },
       diagramComponentIds: ["app-pod", "release-secret", "helm-cli"],
       diagramConnectionIds: ["helm-api"],
@@ -174,8 +174,8 @@ kubectl get deploy,svc -l app.kubernetes.io/instance=my-nginx`,
       code: {
         language: "bash",
         title: "Template debug",
-        code: `helm get values my-nginx
-helm template my-nginx bitnami/nginx --debug | head`,
+        code: `helm get values my-podinfo
+helm template my-podinfo podinfo/podinfo --debug | head`,
       },
       diagramComponentIds: ["helm-cli"],
     },

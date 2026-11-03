@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -6,7 +5,7 @@ const base = clusterBase({
   highlightSvc: true,
 });
 
-export const grafana: Tool = {
+export const grafana = {
   id: "grafana",
   name: "Grafana",
   layer: "observability",

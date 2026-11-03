@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -6,7 +5,7 @@ const base = clusterBase({
   highlightApi: true,
 });
 
-export const opentelemetry: Tool = {
+export const opentelemetry = {
   id: "opentelemetry",
   name: "OpenTelemetry",
   layer: "observability",
@@ -121,7 +120,8 @@ export const opentelemetry: Tool = {
 helm repo update
 helm install otel open-telemetry/opentelemetry-collector \\
   --namespace observability --create-namespace \\
-  --set mode=deployment`,
+  --set mode=deployment \\
+  --set image.repository=otel/opentelemetry-collector-k8s`,
       },
       diagramComponentIds: ["otel-collector"],
     },

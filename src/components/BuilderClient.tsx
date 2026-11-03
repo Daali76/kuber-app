@@ -41,14 +41,13 @@ export function BuilderClient() {
   const [scale, setScale] = useState<Scale>("medium");
   const [environment, setEnvironment] = useState<Environment>("cloud");
   const [priorities, setPriorities] = useState<Priority[]>(["simplicity"]);
-  const [submitted, setSubmitted] = useState(false);
-
-  const input: BuilderInput = { teamSize, scale, environment, priorities };
+  const [submittedInput, setSubmittedInput] = useState<BuilderInput | null>(
+    null,
+  );
 
   const stack = useMemo(
-    () => (submitted ? recommendStack(input) : null),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [submitted, teamSize, scale, environment, priorities.join(",")],
+    () => (submittedInput ? recommendStack(submittedInput) : null),
+    [submittedInput],
   );
 
   const order = stack ? installationOrder(stack) : [];
@@ -57,7 +56,7 @@ export function BuilderClient() {
     setPriorities((prev) =>
       prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p],
     );
-    setSubmitted(false);
+    setSubmittedInput(null);
   }
 
   return (
@@ -68,7 +67,7 @@ export function BuilderClient() {
           value={teamSize}
           onChange={(v) => {
             setTeamSize(v);
-            setSubmitted(false);
+            setSubmittedInput(null);
           }}
         />
       </Field>
@@ -78,7 +77,7 @@ export function BuilderClient() {
           value={scale}
           onChange={(v) => {
             setScale(v);
-            setSubmitted(false);
+            setSubmittedInput(null);
           }}
         />
       </Field>
@@ -88,7 +87,7 @@ export function BuilderClient() {
           value={environment}
           onChange={(v) => {
             setEnvironment(v);
-            setSubmitted(false);
+            setSubmittedInput(null);
           }}
         />
       </Field>
@@ -116,7 +115,9 @@ export function BuilderClient() {
 
       <button
         type="button"
-        onClick={() => setSubmitted(true)}
+        onClick={() =>
+          setSubmittedInput({ teamSize, scale, environment, priorities })
+        }
         className="flex min-h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-teal-400 to-sky-400 font-[family-name:var(--font-display)] text-base font-semibold text-slate-950 transition active:scale-[0.99]"
       >
         Recommend stack

@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -8,7 +7,7 @@ const base = clusterBase({
   highlightIngress: true,
 });
 
-export const istio: Tool = {
+export const istio = {
   id: "istio",
   name: "Istio",
   layer: "networking",
@@ -140,12 +139,12 @@ kubectl get ns istio-system`,
     {
       id: "verify",
       title: "Verify",
-      description: "istiod Running; injection webhook present.",
+      description: "istio-system pods Running; `istioctl analyze` reports no errors.",
       code: {
         language: "bash",
         title: "Control plane",
-        code: `kubectl -n istio-system get deploy
-istioctl verify-install`,
+        code: `kubectl -n istio-system get pods
+istioctl analyze`,
       },
       expectedOutput: `istiod ... Ready`,
       diagramComponentIds: ["istiod"],

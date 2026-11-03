@@ -11,9 +11,24 @@ import { helm } from "./helm";
 import { istio } from "./istio";
 import { kubernetes } from "./kubernetes";
 import { kyverno } from "./kyverno";
+import { getLearningPack } from "./learning-packs";
 import { opentelemetry } from "./opentelemetry";
 import { prometheus } from "./prometheus";
 import { rook } from "./rook";
+
+function withLearning<T extends { id: string; levels: Tool["levels"] }>(
+  tool: T,
+): Tool {
+  const pack = getLearningPack(tool.id);
+  if (!pack) {
+    throw new Error(`Missing learning pack for tool: ${tool.id}`);
+  }
+  return {
+    ...tool,
+    ...pack,
+    levels: pack.levels,
+  } as unknown as Tool;
+}
 
 export const tools: Tool[] = [
   kubernetes,
@@ -31,7 +46,7 @@ export const tools: Tool[] = [
   falco,
   kyverno,
   rook,
-];
+].map(withLearning);
 
 export function getTool(id: string): Tool | undefined {
   return tools.find((t) => t.id === id);

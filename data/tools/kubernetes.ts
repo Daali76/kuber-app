@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -12,7 +11,7 @@ const base = clusterBase({
   highlightSvc: true,
 });
 
-export const kubernetes: Tool = {
+export const kubernetes = {
   id: "kubernetes",
   name: "Kubernetes",
   layer: "orchestration",

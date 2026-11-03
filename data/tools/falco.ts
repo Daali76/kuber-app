@@ -1,4 +1,3 @@
-import type { Tool } from "@/lib/types";
 import { clusterBase, mergeDiagram } from "./_base";
 
 const base = clusterBase({
@@ -7,7 +6,7 @@ const base = clusterBase({
   highlightRuntime: true,
 });
 
-export const falco: Tool = {
+export const falco = {
   id: "falco",
   name: "Falco",
   layer: "security",

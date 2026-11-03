@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Outfit, Syne } from "next/font/google";
+import { JetBrains_Mono, Outfit, Syne, Vazirmatn } from "next/font/google";
+import { Providers } from "@/components/Providers";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 const display = Syne({
@@ -20,13 +22,19 @@ const mono = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
+const fa = Vazirmatn({
+  variable: "--font-fa",
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: {
     default: "Cloud Native Atlas",
     template: "%s · Cloud Native Atlas",
   },
   description:
-    "Mobile-first map of CNCF tools across the cloud-native stack — learn, compare, and build your stack.",
+    "Mobile-first learning map of CNCF tools — foundations, labs, quizzes, and offline study.",
   applicationName: "Cloud Native Atlas",
   appleWebApp: {
     capable: true,
@@ -57,9 +65,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${display.variable} ${body.variable} ${mono.variable} h-full dark`}
+      className={`${display.variable} ${body.variable} ${mono.variable} ${fa.variable} h-full dark`}
     >
-      <body className="min-h-full flex flex-col antialiased">{children}</body>
+      <body className="flex min-h-full flex-col antialiased">
+        <Providers>
+          <ServiceWorkerRegister />
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 }
