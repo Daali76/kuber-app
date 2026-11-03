@@ -1,0 +1,55 @@
+name: Static build
+
+on:
+  push:
+    branches:
+      - cursor/cloud-native-atlas-da00
+
+permissions:
+  contents: write
+
+concurrency:
+  group: static-build
+  cancel-in-progress: true
+
+jobs:
+  export-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static export
+        run: npm run build
+
+      - name: Publish out/ to static-build branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -d out
+          WORKDIR="$(mktemp -d)"
+          cp -a out/. "$WORKDIR/"
+          cd "$WORKDIR"
+          git init
+          git checkout -b static-build
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Keep Actions from treating ignored patterns as a problem on this orphan branch
+          printf '# static export artifacts\n' > .gitignore
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish."
+            exit 0
+          fi
+          git commit -m "Static export from ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:static-build

@@ -23,6 +23,19 @@ npm run build
 npm start
 ```
 
+## Static export
+
+`next.config.ts` uses `output: "export"` (images unoptimized). `npm run build` writes a static site to `out/`.
+
+On every push to `cursor/cloud-native-atlas-da00`, GitHub Actions builds and force-pushes the contents of `out/` to the `static-build` branch (see `.github/workflows/static-build.yml`).
+
+Serve locally:
+
+```bash
+npm run build
+npx serve out
+```
+
 ## Deploy on Vercel
 
 1. Push this repo to GitHub.
